@@ -19,7 +19,6 @@ string windowsFromUnixPath(string path){
 //------------------------------------------------------
 bool testApp::isAddonCore(string addon){
 
-
     if (bInited == false){
         coreAddons.push_back("ofx3DModelLoader");
         coreAddons.push_back("ofxAssimpModelLoader");
@@ -35,8 +34,6 @@ bool testApp::isAddonCore(string addon){
         coreAddons.push_back("ofxSvg");
         bInited = true;
     }
-
-
 
     for (int i = 0; i < coreAddons.size(); i++){
 
@@ -102,19 +99,14 @@ string testApp::setupForTarget(int targ){
     }
 
     project->setup(target);
-
     return target;
 }
-
-
 
 void testApp::setStatus(string newStatus){
     statusEnergy = 1;
     status = newStatus;
     statusSetTime = ofGetElapsedTimef();
 }
-
-
 
 //--------------------------------------------------------------
 void testApp::setup(){
@@ -123,7 +115,6 @@ void testApp::setup(){
     ofSetLogLevel(OF_LOG_VERBOSE);
     ofSetVerticalSync(true);
 
-    
     statusEnergy = 0;
     
     mode = 0;
@@ -139,7 +130,7 @@ void testApp::setup(){
     XML.loadFile("settings/projectGeneratorSettings.xml");
     appToRoot = XML.getValue("appToRoot", "../../../../");
     defaultLoc = XML.getValue("defaultNewProjectLocation", "apps/myApps");
-       //-------------------------------------
+    //-------------------------------------
     // calculate the bin path (../../../ on osx) and the sketch path (bin -> root - > defaultLoc)
     //-------------------------------------
 
@@ -156,7 +147,6 @@ void testApp::setup(){
     addonsPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot,"addons"));
     sketchPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot, defaultLoc));
 
-
     convertWindowsToUnixPath(ofRoot);
     convertWindowsToUnixPath(addonsPath);
     convertWindowsToUnixPath(sketchPath);
@@ -164,12 +154,9 @@ void testApp::setup(){
     // there's some issues internally in OF with non unix paths for OF root
     setOFRoot(ofRoot);
 
-
-
     //-------------------------------------
     // get settings
     //-------------------------------------
-
 
     //-------------------------------------
     // load font and setup the buttons
@@ -471,8 +458,6 @@ void testApp::generateProject(){
         return;
     }
 
-
-
     printf("start with project generation \n");
 
     string path = ofFilePath::join(buttons[1].myText, buttons[0].myText);
@@ -491,7 +476,6 @@ void testApp::generateProject(){
 
                 }
             }
-
 
             addonsToggles = panelOtherAddons.getControlNames();
             for (int i = 0; i < (int) addonsToggles.size(); i++){

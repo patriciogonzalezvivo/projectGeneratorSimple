@@ -14,8 +14,6 @@
 #include "ofxXmlSettings.h"
 #include "textButton.h"
 
-
-
 class testApp : public ofBaseApp{
 
 	public:
@@ -69,7 +67,6 @@ class testApp : public ofBaseApp{
 		
 		float uiLeftX; 
     
-    
         textButton  button;
         textButton  generateButton;
         textButton  addonButton;
@@ -85,5 +82,4 @@ class testApp : public ofBaseApp{
         void setStatus(string newStatus);
         
         ofImage logo;
-    
 };
