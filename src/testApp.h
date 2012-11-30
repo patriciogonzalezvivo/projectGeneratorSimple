@@ -15,71 +15,66 @@
 #include "textButton.h"
 
 class testApp : public ofBaseApp{
+public:
+    void setup();
+    void update();
+    void draw();
 
-	public:
-		void setup();
-		void update();
-		void draw();
-
-		void keyPressed  (int key);
-		void keyReleased(int key);
-		void mouseMoved(int x, int y );
-		void mouseDragged(int x, int y, int button);
-		void mousePressed(int x, int y, int button);
-		void mouseReleased(int x, int y, int button);
-		void windowResized(int w, int h);
-		void dragEvent(ofDragInfo dragInfo);
-		void gotMessage(ofMessage msg);
+    void keyPressed  (int key);
+    void keyReleased(int key);
+    void mouseMoved(int x, int y );
+    void mouseDragged(int x, int y, int button);
+    void mousePressed(int x, int y, int button);
+    void mouseReleased(int x, int y, int button);
+    void windowResized(int w, int h);
+    void dragEvent(ofDragInfo dragInfo);
+    void gotMessage(ofMessage msg);
  
+    //  Project
+    //
+    string  setupForTarget(int targ);
+    void    loadProject(string _path);
+    void    generateProject();
     
-        string sketchName;
-        string sketchPath;
-        string addons;
-        string platform;
+    bool    isAddonCore(string addon);
+    bool    bInited;
+    vector<string> coreAddons;
     
-        ofxPanel panelCoreAddons;
-        ofxPanel panelOtherAddons;
-        bool bHaveNonCoreAddons;
+    string  appToRoot;
+    string  defaultLoc;
+    string  addonsPath;
     
-        ofxPanel panelPlatforms;
+    baseProject *project;
     
-        ofxToggle osxToggle, iosToggle, wincbToggle, winvsToggle, linuxcbToggle, linux64cbToggle;
-
-        ofTrueTypeFont font;
-        ofTrueTypeFont titleFont;
-        ofTrueTypeFont secondFont;
+    //  GUI
+    //
+    int mode;
+    enum { MODE_NORMAL, MODE_ADDON, MODE_PLATFORM };
     
-        int mode;
-        enum { MODE_NORMAL, MODE_ADDON, MODE_PLATFORM };
+    ofxPanel        panelPlatforms;
+    ofxToggle       osxToggle, iosToggle, wincbToggle, winvsToggle, linuxcbToggle, linux64cbToggle;
     
-        baseProject * project;
+    ofxPanel        panelCoreAddons;
+    ofxPanel        panelOtherAddons;
+    bool            bHaveNonCoreAddons;
     
-        string setupForTarget(int targ);
+    vector<textButton> buttons;
+    textButton      addonButton;
+    textButton      generateButton;
     
-        void generateProject();
+    //  Status
+    //
+    string  status;
+    float   statusSetTime;
+    float   statusEnergy;
+    void    setStatus(string newStatus);
     
-        string addonsPath;
-        string status;
-    
-        ofxXmlSettings XML;
-        string appToRoot;
-        string defaultLoc;
+    //  Design
+    //
+    ofImage logo;
+    ofTrueTypeFont font;
+    ofTrueTypeFont titleFont;
+    ofTrueTypeFont secondFont;
 		
-		float uiLeftX; 
-    
-        textButton  button;
-        textButton  generateButton;
-        textButton  addonButton;
-        vector < textButton > buttons;
-
-        bool isAddonCore(string addon);
-        bool bInited;
-        vector < string  > coreAddons;
-    
-        
-        float statusSetTime;
-        float statusEnergy;
-        void setStatus(string newStatus);
-        
-        ofImage logo;
+    float uiLeftX;
 };

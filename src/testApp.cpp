@@ -36,7 +36,6 @@ bool testApp::isAddonCore(string addon){
     }
 
     for (int i = 0; i < coreAddons.size(); i++){
-
         if (coreAddons[i] == addon){
             return true;
         }
@@ -120,32 +119,32 @@ void testApp::setup(){
     mode = 0;
     bInited = false;
     project = NULL;
-    sketchName = "mySketch";
+    string sketchName = "mySketch";
 	
 
     //-------------------------------------
     // get settings
     //-------------------------------------
-
+    ofxXmlSettings XML;
     XML.loadFile("settings/projectGeneratorSettings.xml");
     appToRoot = XML.getValue("appToRoot", "../../../../");
     defaultLoc = XML.getValue("defaultNewProjectLocation", "apps/myApps");
+    
     //-------------------------------------
     // calculate the bin path (../../../ on osx) and the sketch path (bin -> root - > defaultLoc)
     //-------------------------------------
 
     // if appToRoot is wrong, we have alot of issues.  all these paths are used in this project:
-
+    //
 #ifdef TARGET_OSX
     string binPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofFilePath::getCurrentWorkingDirectory(), "../../../"));
 #else
     string binPath = ofFilePath::getCurrentExeDir();
 #endif
-
+    
     string ofRoot = ofFilePath::getAbsolutePath(ofFilePath::join(binPath, appToRoot));
-
     addonsPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot,"addons"));
-    sketchPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot, defaultLoc));
+    string sketchPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot, defaultLoc));
 
     convertWindowsToUnixPath(ofRoot);
     convertWindowsToUnixPath(addonsPath);
@@ -166,6 +165,7 @@ void testApp::setup(){
     
     //  Sketch button
     //
+    textButton  button;
     button.font = &font;
     button.secondFont = &secondFont;
     button.prefix = "Name: ";
@@ -192,7 +192,7 @@ void testApp::setup(){
     button.bDrawLong = false;
     button.secondaryText = "";
     button.bSelectable = false;
-    button.setText(platform);
+    button.setText("");
 
     button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
     buttons.push_back(button);
@@ -204,7 +204,7 @@ void testApp::setup(){
     button.prefix = "Addons: ";
     button.secondaryText = "<< CLICK TO SELECT ADDONS";
     button.bSelectable = true;
-    button.setText(addons);
+    button.setText("");
 
     button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
     buttons.push_back(button);
@@ -225,7 +225,6 @@ void testApp::setup(){
     addonButton.prefix = "<< BACK";
     addonButton.setText("");
     addonButton.bDrawLong = false;
-    
 
     for (int i = 0; i < buttons.size(); i++){
         buttons[i].calculateRect();
@@ -233,10 +232,9 @@ void testApp::setup(){
     addonButton.calculateRect();
     generateButton.calculateRect();
 
-    //-------------------------------------
-    // addons panels:
-    //-------------------------------------
-
+    
+    // Load Addons into panels
+    //
     panelCoreAddons.setup();
     panelOtherAddons.setup();
 
@@ -247,7 +245,6 @@ void testApp::setup(){
     	string addon = addons.getName(i);
 
     	if(addon.find("ofx")==0){
-
             if (isAddonCore(addon)){
                 ofxToggle * toggle = new ofxToggle();
                 panelCoreAddons.add(toggle->setup(addon,false,300));
@@ -256,8 +253,6 @@ void testApp::setup(){
                 ofxToggle * toggle = new ofxToggle();
                 panelOtherAddons.add(toggle->setup(addon,false,300));
             }
-
-
     	}
     }
 
@@ -300,7 +295,6 @@ void testApp::setup(){
     panelCoreAddons.setPosition(10,40);
     panelOtherAddons.setPosition(330,40);
    
-
     logo.loadImage("images/ofw-logo.png");
 
     ofBackground(230,230,230);
@@ -316,11 +310,6 @@ void testApp::setup(){
 
 }
 
-
-
-
-
-
 //--------------------------------------------------------------
 void testApp::update(){
 
@@ -332,8 +321,8 @@ void testApp::update(){
     // if we are in addon mode check
     //-------------------------------------
 
-    if (mode == MODE_ADDON ) addonButton.checkMousePressed(ofPoint(mouseX, mouseY));
-
+    if (mode == MODE_ADDON )
+        addonButton.checkMousePressed(ofPoint(mouseX, mouseY));
 
     //-------------------------------------
     // layout our normal buttons, check the mouse
@@ -373,8 +362,6 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-
-    
     
     if (mode != MODE_ADDON ) {
         
@@ -402,10 +389,6 @@ void testApp::draw(){
         panelPlatforms.draw();
     }
     //cout << panelAddons.getShape().height << endl;
-
-
-    
-    
     if (mode == 1 ){
         addonButton.draw();
         
@@ -464,6 +447,7 @@ void testApp::generateProject(){
 
 	for(int i = 0; i < (int)targetsToMake.size(); i++){
 		string target = setupForTarget(targetsToMake[i]);
+        
         if(project->create(path)){
             vector<string> addonsToggles = panelCoreAddons.getControlNames();
             for (int i = 0; i < (int) addonsToggles.size(); i++){
@@ -482,7 +466,6 @@ void testApp::generateProject(){
                 ofxToggle toggle = panelOtherAddons.getToggle(addonsToggles[i]);
                 if(toggle){
                     ofAddon addon;
-
                     addon.pathToOF = getOFRelPath(path);
                     cout << getOFRelPath(path) << " " << path << endl;
                     addon.fromFS(ofFilePath::join(addonsPath, addonsToggles[i]),target);
@@ -523,20 +506,15 @@ void testApp::mouseDragged(int x, int y, int button){
 void testApp::mousePressed(int x, int y, int button){
 
     if (mode == MODE_NORMAL){
-
-
         // check the mouse for press
-
+        //
         for (int i = 0; i < buttons.size(); i++){
             buttons[i].checkMousePressed(ofPoint(x, y));
         }
         
-
         //-------------------------------------
         // 4 = genearate
         //-------------------------------------
-
-        
         if (generateButton.bMouseOver == true){
             generateProject();
         }
@@ -544,7 +522,6 @@ void testApp::mousePressed(int x, int y, int button){
         //-------------------------------------
         // 0 = sketch name
         //-------------------------------------
-
         if (buttons[0].bMouseOver == true){
             string text = ofSystemTextBoxDialog("choose sketch name", buttons[0].myText);
             fixStringCharacters(text);
@@ -555,7 +532,6 @@ void testApp::mousePressed(int x, int y, int button){
         //-------------------------------------
         // 1 = sketch path
         //-------------------------------------
-
         if (buttons[1].bMouseOver == true){
 
             string command = "";
@@ -617,9 +593,7 @@ void testApp::mousePressed(int x, int y, int button){
         //-------------------------------------
 
         if (addonButton.bMouseOver){
-
             string addons = "";
-
             for (int i = 0; i < panelCoreAddons.getNumControls(); i++){
                 if (*((ofxToggle *)panelCoreAddons.getControl(i))){
                    if (addons.length() > 0) addons+=", ";
@@ -674,5 +648,83 @@ void testApp::gotMessage(ofMessage msg){
 
 //--------------------------------------------------------------
 void testApp::dragEvent(ofDragInfo dragInfo){
+    if (dragInfo.files.size() > 1)
+        for (int i = 0; i < dragInfo.files.size(); i++){
+            cout << dragInfo.files[i] << endl;
+    } else if (dragInfo.files.size() == 1) {
+        ofDirectory pathFolder;
+        pathFolder.open(dragInfo.files[0]);
+        
+        // 1.If is a directory
+        //
+        if (!pathFolder.isDirectory())
+            return;
+        
+        //  2. and have a:
+        //          - src/main.cpp
+        //          - src/testApp.h
+        //          - src/testApp.cpp
+        ofFile test;
+        bool    isMainCpp = test.open(dragInfo.files[0]+"/src/main.cpp");
+        bool    isTestAppH = test.open(dragInfo.files[0]+"/src/testApp.h");
+        bool    isTestAppCpp = test.open(dragInfo.files[0]+"/src/testApp.cpp");
+        if ( !(isMainCpp && isTestAppH && isTestAppCpp) )
+            return;
+        
+        loadProject(dragInfo.files[0]);
+    }
+}
 
+void testApp::loadProject(string _path){
+    //  Extract Name and Path
+    //
+    string tmpName = "";
+    string tmpPath = "";
+    int i;
+    for (i = _path.size()-1 ; _path[i] != '/'; i--){
+        tmpName.insert(tmpName.begin(), _path[i]);
+    }
+    buttons[0].setText(tmpName);
+    for (i-- ; _path[i] >= 0; i--){
+        tmpPath.insert(tmpPath.begin(), _path[i]);
+    }
+    buttons[1].setText(tmpPath);
+    
+    setStatus("Project " + tmpName + " loaded ");
+    
+    //  Have addons.make??
+    //
+    ofFile test;
+    bool    isAddons = test.open(_path+"/addons.make");
+    if ( !isAddons )
+        return;
+    
+    //  Add addons
+    //
+    ifstream	fs( (_path+"/addons.make").c_str());
+    int counter = 0;
+    string line;
+    string addonsAdded = "";
+    while(!(fs >> line).fail()){
+        
+        if ( isAddonCore(line) ){
+            ofxToggle *toogle = (ofxToggle*)panelCoreAddons.getControl(line);
+            if (toogle != NULL)
+                *toogle = true;
+        } else {
+            ofxToggle *toogle = (ofxToggle*)panelOtherAddons.getControl(line);
+            if (toogle != NULL)
+                *toogle = true;
+        }
+        
+        if (counter > 0)
+            addonsAdded +=", ";
+        addonsAdded += line;
+        counter++;
+    }
+    fs.seekg(0,ios::beg);
+    fs.clear();
+    fs.close();
+    
+    buttons[3].setText(addonsAdded);
 }
