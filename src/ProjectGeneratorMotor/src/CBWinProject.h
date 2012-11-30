@@ -9,7 +9,7 @@
 #define CBWINPROJECT_H_
 
 #include "ofConstants.h"
-#include "ofxPugiXml.h"
+#include "pugixml.hpp"
 #include "ofAddon.h"
 #include "baseProject.h"
 

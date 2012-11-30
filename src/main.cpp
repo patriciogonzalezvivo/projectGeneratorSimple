@@ -1,8 +1,6 @@
 #include "ofMain.h"
 #include "testApp.h"
 #include "ofAppGlutWindow.h"
-#include "ofAppNoWindow.h"
-
 
 //========================================================================
 int main(  int argc, char *argv[]  ){

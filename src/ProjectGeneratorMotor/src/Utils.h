@@ -10,7 +10,7 @@
 
 #include "ofConstants.h"
 
-#include "ofxPugiXml.h
+#include "pugixml.hpp"
 
 #include "ofMain.h"
 

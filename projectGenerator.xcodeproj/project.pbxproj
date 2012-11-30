@@ -17,14 +17,14 @@
 		11EA2C86162238A1002A3882 /* ofxPanel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11EA2C7D162238A1002A3882 /* ofxPanel.cpp */; };
 		11EA2C87162238A1002A3882 /* ofxSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11EA2C7F162238A1002A3882 /* ofxSlider.cpp */; };
 		11EA2C88162238A1002A3882 /* ofxToggle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 11EA2C81162238A1002A3882 /* ofxToggle.cpp */; };
-		3D520AE61668F77300212598 /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520AD41668F77300212598 /* pugixml.cpp */; };
-		3D520AFC1668F7EA00212598 /* baseProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520AEE1668F7EA00212598 /* baseProject.cpp */; };
-		3D520AFD1668F7EA00212598 /* CBLinuxProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520AF01668F7EA00212598 /* CBLinuxProject.cpp */; };
-		3D520AFE1668F7EA00212598 /* CBWinProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520AF21668F7EA00212598 /* CBWinProject.cpp */; };
-		3D520AFF1668F7EA00212598 /* ofAddon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520AF41668F7EA00212598 /* ofAddon.cpp */; };
-		3D520B001668F7EA00212598 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520AF61668F7EA00212598 /* Utils.cpp */; };
-		3D520B011668F7EA00212598 /* visualStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520AF81668F7EA00212598 /* visualStudioProject.cpp */; };
-		3D520B021668F7EA00212598 /* xcodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520AFA1668F7EA00212598 /* xcodeProject.cpp */; };
+		3D520B3916692BD700212598 /* pugixml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520B2816692BD700212598 /* pugixml.cpp */; };
+		3D520B3A16692BD700212598 /* baseProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520B2B16692BD700212598 /* baseProject.cpp */; };
+		3D520B3B16692BD700212598 /* CBLinuxProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520B2D16692BD700212598 /* CBLinuxProject.cpp */; };
+		3D520B3C16692BD700212598 /* CBWinProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520B2F16692BD700212598 /* CBWinProject.cpp */; };
+		3D520B3D16692BD700212598 /* ofAddon.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520B3116692BD700212598 /* ofAddon.cpp */; };
+		3D520B3E16692BD700212598 /* Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520B3316692BD700212598 /* Utils.cpp */; };
+		3D520B3F16692BD700212598 /* visualStudioProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520B3516692BD700212598 /* visualStudioProject.cpp */; };
+		3D520B4016692BD700212598 /* xcodeProject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3D520B3716692BD700212598 /* xcodeProject.cpp */; };
 		BBAB23CB13894F3D00AA2426 /* GLUT.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = BBAB23BE13894E4700AA2426 /* GLUT.framework */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
@@ -96,28 +96,26 @@
 		11EA2C80162238A1002A3882 /* ofxSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxSlider.h; sourceTree = "<group>"; };
 		11EA2C81162238A1002A3882 /* ofxToggle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxToggle.cpp; sourceTree = "<group>"; };
 		11EA2C82162238A1002A3882 /* ofxToggle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxToggle.h; sourceTree = "<group>"; };
-		3D520AD01668F77300212598 /* foreach.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = foreach.hpp; sourceTree = "<group>"; };
-		3D520AD11668F77300212598 /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = readme.txt; sourceTree = "<group>"; };
-		3D520AD31668F77300212598 /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pugiconfig.hpp; sourceTree = "<group>"; };
-		3D520AD41668F77300212598 /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pugixml.cpp; sourceTree = "<group>"; };
-		3D520AD51668F77300212598 /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pugixml.hpp; sourceTree = "<group>"; };
-		3D520AD61668F77300212598 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = README.md; sourceTree = "<group>"; };
-		3D520AD81668F77300212598 /* ofxPugiXml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxPugiXml.h; sourceTree = "<group>"; };
-		3D520AEE1668F7EA00212598 /* baseProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = baseProject.cpp; sourceTree = "<group>"; };
-		3D520AEF1668F7EA00212598 /* baseProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baseProject.h; sourceTree = "<group>"; };
-		3D520AF01668F7EA00212598 /* CBLinuxProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CBLinuxProject.cpp; sourceTree = "<group>"; };
-		3D520AF11668F7EA00212598 /* CBLinuxProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLinuxProject.h; sourceTree = "<group>"; };
-		3D520AF21668F7EA00212598 /* CBWinProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CBWinProject.cpp; sourceTree = "<group>"; };
-		3D520AF31668F7EA00212598 /* CBWinProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBWinProject.h; sourceTree = "<group>"; };
-		3D520AF41668F7EA00212598 /* ofAddon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofAddon.cpp; sourceTree = "<group>"; };
-		3D520AF51668F7EA00212598 /* ofAddon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofAddon.h; sourceTree = "<group>"; };
-		3D520AF61668F7EA00212598 /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
-		3D520AF71668F7EA00212598 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
-		3D520AF81668F7EA00212598 /* visualStudioProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = visualStudioProject.cpp; sourceTree = "<group>"; };
-		3D520AF91668F7EA00212598 /* visualStudioProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = visualStudioProject.h; sourceTree = "<group>"; };
-		3D520AFA1668F7EA00212598 /* xcodeProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xcodeProject.cpp; sourceTree = "<group>"; };
-		3D520AFB1668F7EA00212598 /* xcodeProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xcodeProject.h; sourceTree = "<group>"; };
 		3D520B041668F80A00212598 /* textButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = textButton.h; sourceTree = "<group>"; };
+		3D520B2416692BD700212598 /* foreach.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = foreach.hpp; sourceTree = "<group>"; };
+		3D520B2516692BD700212598 /* readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = readme.txt; sourceTree = "<group>"; };
+		3D520B2716692BD700212598 /* pugiconfig.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pugiconfig.hpp; sourceTree = "<group>"; };
+		3D520B2816692BD700212598 /* pugixml.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pugixml.cpp; sourceTree = "<group>"; };
+		3D520B2916692BD700212598 /* pugixml.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = pugixml.hpp; sourceTree = "<group>"; };
+		3D520B2B16692BD700212598 /* baseProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = baseProject.cpp; sourceTree = "<group>"; };
+		3D520B2C16692BD700212598 /* baseProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baseProject.h; sourceTree = "<group>"; };
+		3D520B2D16692BD700212598 /* CBLinuxProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CBLinuxProject.cpp; sourceTree = "<group>"; };
+		3D520B2E16692BD700212598 /* CBLinuxProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLinuxProject.h; sourceTree = "<group>"; };
+		3D520B2F16692BD700212598 /* CBWinProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CBWinProject.cpp; sourceTree = "<group>"; };
+		3D520B3016692BD700212598 /* CBWinProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBWinProject.h; sourceTree = "<group>"; };
+		3D520B3116692BD700212598 /* ofAddon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofAddon.cpp; sourceTree = "<group>"; };
+		3D520B3216692BD700212598 /* ofAddon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofAddon.h; sourceTree = "<group>"; };
+		3D520B3316692BD700212598 /* Utils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Utils.cpp; sourceTree = "<group>"; };
+		3D520B3416692BD700212598 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
+		3D520B3516692BD700212598 /* visualStudioProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = visualStudioProject.cpp; sourceTree = "<group>"; };
+		3D520B3616692BD700212598 /* visualStudioProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = visualStudioProject.h; sourceTree = "<group>"; };
+		3D520B3716692BD700212598 /* xcodeProject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = xcodeProject.cpp; sourceTree = "<group>"; };
+		3D520B3816692BD700212598 /* xcodeProject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xcodeProject.h; sourceTree = "<group>"; };
 		BBAB23BE13894E4700AA2426 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = ../../../libs/glut/lib/osx/GLUT.framework; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
@@ -227,79 +225,78 @@
 			path = src;
 			sourceTree = "<group>";
 		};
-		3D520ACD1668F77300212598 /* ofxPugiXml */ = {
-			isa = PBXGroup;
-			children = (
-				3D520ACE1668F77300212598 /* libs */,
-				3D520AD61668F77300212598 /* README.md */,
-				3D520AD71668F77300212598 /* src */,
-			);
-			path = ofxPugiXml;
-			sourceTree = "<group>";
-		};
-		3D520ACE1668F77300212598 /* libs */ = {
-			isa = PBXGroup;
-			children = (
-				3D520ACF1668F77300212598 /* contrib */,
-				3D520AD11668F77300212598 /* readme.txt */,
-				3D520AD21668F77300212598 /* src */,
-			);
-			path = libs;
-			sourceTree = "<group>";
-		};
-		3D520ACF1668F77300212598 /* contrib */ = {
-			isa = PBXGroup;
-			children = (
-				3D520AD01668F77300212598 /* foreach.hpp */,
-			);
-			path = contrib;
-			sourceTree = "<group>";
-		};
-		3D520AD21668F77300212598 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				3D520AD31668F77300212598 /* pugiconfig.hpp */,
-				3D520AD41668F77300212598 /* pugixml.cpp */,
-				3D520AD51668F77300212598 /* pugixml.hpp */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		3D520AD71668F77300212598 /* src */ = {
-			isa = PBXGroup;
-			children = (
-				3D520AD81668F77300212598 /* ofxPugiXml.h */,
-			);
-			path = src;
-			sourceTree = "<group>";
-		};
-		3D520AED1668F7EA00212598 /* ProjectGeneratorMotor */ = {
-			isa = PBXGroup;
-			children = (
-				3D520AEE1668F7EA00212598 /* baseProject.cpp */,
-				3D520AEF1668F7EA00212598 /* baseProject.h */,
-				3D520AF01668F7EA00212598 /* CBLinuxProject.cpp */,
-				3D520AF11668F7EA00212598 /* CBLinuxProject.h */,
-				3D520AF21668F7EA00212598 /* CBWinProject.cpp */,
-				3D520AF31668F7EA00212598 /* CBWinProject.h */,
-				3D520AF41668F7EA00212598 /* ofAddon.cpp */,
-				3D520AF51668F7EA00212598 /* ofAddon.h */,
-				3D520AF61668F7EA00212598 /* Utils.cpp */,
-				3D520AF71668F7EA00212598 /* Utils.h */,
-				3D520AF81668F7EA00212598 /* visualStudioProject.cpp */,
-				3D520AF91668F7EA00212598 /* visualStudioProject.h */,
-				3D520AFA1668F7EA00212598 /* xcodeProject.cpp */,
-				3D520AFB1668F7EA00212598 /* xcodeProject.h */,
-			);
-			path = ProjectGeneratorMotor;
-			sourceTree = "<group>";
-		};
 		3D520B031668F80A00212598 /* gui */ = {
 			isa = PBXGroup;
 			children = (
 				3D520B041668F80A00212598 /* textButton.h */,
 			);
 			path = gui;
+			sourceTree = "<group>";
+		};
+		3D520B2016692BD700212598 /* ProjectGeneratorMotor */ = {
+			isa = PBXGroup;
+			children = (
+				3D520B2116692BD700212598 /* libs */,
+				3D520B2A16692BD700212598 /* src */,
+			);
+			path = ProjectGeneratorMotor;
+			sourceTree = "<group>";
+		};
+		3D520B2116692BD700212598 /* libs */ = {
+			isa = PBXGroup;
+			children = (
+				3D520B2216692BD700212598 /* pugixml */,
+			);
+			path = libs;
+			sourceTree = "<group>";
+		};
+		3D520B2216692BD700212598 /* pugixml */ = {
+			isa = PBXGroup;
+			children = (
+				3D520B2316692BD700212598 /* contrib */,
+				3D520B2516692BD700212598 /* readme.txt */,
+				3D520B2616692BD700212598 /* src */,
+			);
+			path = pugixml;
+			sourceTree = "<group>";
+		};
+		3D520B2316692BD700212598 /* contrib */ = {
+			isa = PBXGroup;
+			children = (
+				3D520B2416692BD700212598 /* foreach.hpp */,
+			);
+			path = contrib;
+			sourceTree = "<group>";
+		};
+		3D520B2616692BD700212598 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				3D520B2716692BD700212598 /* pugiconfig.hpp */,
+				3D520B2816692BD700212598 /* pugixml.cpp */,
+				3D520B2916692BD700212598 /* pugixml.hpp */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		3D520B2A16692BD700212598 /* src */ = {
+			isa = PBXGroup;
+			children = (
+				3D520B2B16692BD700212598 /* baseProject.cpp */,
+				3D520B2C16692BD700212598 /* baseProject.h */,
+				3D520B2D16692BD700212598 /* CBLinuxProject.cpp */,
+				3D520B2E16692BD700212598 /* CBLinuxProject.h */,
+				3D520B2F16692BD700212598 /* CBWinProject.cpp */,
+				3D520B3016692BD700212598 /* CBWinProject.h */,
+				3D520B3116692BD700212598 /* ofAddon.cpp */,
+				3D520B3216692BD700212598 /* ofAddon.h */,
+				3D520B3316692BD700212598 /* Utils.cpp */,
+				3D520B3416692BD700212598 /* Utils.h */,
+				3D520B3516692BD700212598 /* visualStudioProject.cpp */,
+				3D520B3616692BD700212598 /* visualStudioProject.h */,
+				3D520B3716692BD700212598 /* xcodeProject.cpp */,
+				3D520B3816692BD700212598 /* xcodeProject.h */,
+			);
+			path = src;
 			sourceTree = "<group>";
 		};
 		BB4B014C10F69532006C3DED /* addons */ = {
@@ -374,8 +371,7 @@
 				E4B69E1D0A3A1BDC003C02F2 /* main.cpp */,
 				E4B69E1F0A3A1BDC003C02F2 /* testApp.h */,
 				E4B69E1E0A3A1BDC003C02F2 /* testApp.cpp */,
-				3D520AED1668F7EA00212598 /* ProjectGeneratorMotor */,
-				3D520ACD1668F77300212598 /* ofxPugiXml */,
+				3D520B2016692BD700212598 /* ProjectGeneratorMotor */,
 				3D520B031668F80A00212598 /* gui */,
 			);
 			path = src;
@@ -486,14 +482,14 @@
 				11EA2C86162238A1002A3882 /* ofxPanel.cpp in Sources */,
 				11EA2C87162238A1002A3882 /* ofxSlider.cpp in Sources */,
 				11EA2C88162238A1002A3882 /* ofxToggle.cpp in Sources */,
-				3D520AE61668F77300212598 /* pugixml.cpp in Sources */,
-				3D520AFC1668F7EA00212598 /* baseProject.cpp in Sources */,
-				3D520AFD1668F7EA00212598 /* CBLinuxProject.cpp in Sources */,
-				3D520AFE1668F7EA00212598 /* CBWinProject.cpp in Sources */,
-				3D520AFF1668F7EA00212598 /* ofAddon.cpp in Sources */,
-				3D520B001668F7EA00212598 /* Utils.cpp in Sources */,
-				3D520B011668F7EA00212598 /* visualStudioProject.cpp in Sources */,
-				3D520B021668F7EA00212598 /* xcodeProject.cpp in Sources */,
+				3D520B3916692BD700212598 /* pugixml.cpp in Sources */,
+				3D520B3A16692BD700212598 /* baseProject.cpp in Sources */,
+				3D520B3B16692BD700212598 /* CBLinuxProject.cpp in Sources */,
+				3D520B3C16692BD700212598 /* CBWinProject.cpp in Sources */,
+				3D520B3D16692BD700212598 /* ofAddon.cpp in Sources */,
+				3D520B3E16692BD700212598 /* Utils.cpp in Sources */,
+				3D520B3F16692BD700212598 /* visualStudioProject.cpp in Sources */,
+				3D520B4016692BD700212598 /* xcodeProject.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

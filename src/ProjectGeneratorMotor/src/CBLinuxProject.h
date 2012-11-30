@@ -12,7 +12,7 @@
 #include "ofAddon.h"
 #include "CBWinProject.h"
 
-#include "ofxPugiXml.h"
+#include "pugixml.hpp"
 
 class CBLinuxProject: public CBWinProject {
 public:
