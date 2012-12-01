@@ -111,7 +111,8 @@ void testApp::setup(){
     mode                = MODE_NORMAL;
     project             = NULL;
     statusEnergy        = 0;
-    string sketchName   = "mySketch";
+    float   margin      = 64;
+    string  sketchName  = "mySketch";
     
     ofBackground(230,230,230);
     logo.loadImage("images/ofw-logo.png");
@@ -161,7 +162,7 @@ void testApp::setup(){
     button.font = &font;
     button.secondFont = &secondFont;
     button.prefix = "Name: ";
-	button.topLeftAnchor.set(76, 160+40); //set top button position - others are set relative to this.
+	button.topLeftAnchor.set(margin+12, 160+40); //set top button position - others are set relative to this.
     button.setText(sketchName);
     button.secondaryText = "<< CLICK TO CHANGE THE NAME";
     buttons.push_back(button);
@@ -180,9 +181,8 @@ void testApp::setup(){
     button.deliminater = ", ";
     button.prefix = "Platforms: ";
     button.secondaryText = "";
-    button.bDrawLong = false;
-    button.secondaryText = "";
-    button.bSelectable = false;
+    button.secondaryText = "<< CLICK TO CHANGE THE PLATFORM";
+//    button.bSelectable = false;
     button.setText("");
     
     button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.height + 20);
@@ -218,77 +218,51 @@ void testApp::setup(){
     
     //  Addon Button
     //
-    addonButton = button;
-    addonButton.topLeftAnchor.set(906, 535);
-    addonButton.prefix = "<< BACK";
-    addonButton.setText("");
-    addonButton.bDrawLong = false;
-    addonButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - addonButton.width + 10 , ofGetHeight() - addonButton.height - 40);
-    addonButton.calculateRect();
+    backButton = button;
+    backButton.topLeftAnchor.set(906, 535);
+    backButton.prefix = "BACK >>";
+    backButton.setText("");
+    backButton.bDrawLong = false;
+    backButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - backButton.width + 10 , ofGetHeight() - backButton.height - 40);
+    backButton.calculateRect();
     
     //  LOAD ADDONS
     //
     loadAddons();
     
-    //-------------------------------------
-    // platform panel (not used, really, but here just in case)
-    //-------------------------------------
-    
-    panelPlatforms.setup();
-    panelPlatforms.add(wincbToggle.setup("windows (codeblocks)",ofGetTargetPlatform()==OF_TARGET_WINGCC));
-	panelPlatforms.add(winvsToggle.setup("windows (visualStudio)", ofGetTargetPlatform()==OF_TARGET_WINVS));
-	panelPlatforms.add(linuxcbToggle.setup("linux (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX));
-	panelPlatforms.add(linux64cbToggle.setup("linux64 (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX64));
-    
-    //for ios, we need to fake that the target is ios (since we're compiling w/ osx OF)
-    
+    //  LOAD PLATFORMS
+    //
+    platformsList.set(64,12,350,500);
+    platformsList.font = &font;
+    platformsList.title = "Platforms";
+    platformsList.addElement("windows (codeblocks)",ofGetTargetPlatform()==OF_TARGET_WINGCC);
+	platformsList.addElement("windows (visualStudio)", ofGetTargetPlatform()==OF_TARGET_WINVS);
+	platformsList.addElement("linux (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX);
+	platformsList.addElement("linux64 (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX64);
+
     //#define MAKE_IOS
-    
 #ifdef MAKE_IOS
-	panelPlatforms.add(osxToggle.setup("osx (xcode)",false));
-	panelPlatforms.add(iosToggle.setup("ios (xcode)",true));
+	platformsList.addElement("osx (xcode)",false);
+	platformsList.addElement("ios (xcode)",true);
 #else
-    panelPlatforms.add(osxToggle.setup("osx (xcode)",ofGetTargetPlatform()==OF_TARGET_OSX));
-	panelPlatforms.add(iosToggle.setup("ios (xcode)",ofGetTargetPlatform()==OF_TARGET_IPHONE));
+    platformsList.addElement("osx (xcode)",ofGetTargetPlatform()==OF_TARGET_OSX);
+	platformsList.addElement("ios (xcode)",ofGetTargetPlatform()==OF_TARGET_IPHONE);
 #endif
     
-    
     // update the platforms text in the platform button
-    string platforms = "";
-    for (int i = 0; i < panelPlatforms.getNumControls(); i++){
-        if (*((ofxToggle *)panelPlatforms.getControl(i))){
-            if (platforms.length() > 0) platforms+=", ";
-            platforms += ((ofxToggle *)panelPlatforms.getControl(i))->getName();
-            
-        };
-    }
-    buttons[2].setText(platforms);
-    panelPlatforms.setPosition(10,40);
+    //
+    buttons[2].setText( platformsList.getSelectedAsString() );
 }
 
 void testApp::loadAddons(){
-    //  Pre define what's a core addon
-    //
-    coreAddons.clear();
-    coreAddons.push_back("ofx3DModelLoader");
-    coreAddons.push_back("ofxAssimpModelLoader");
-    coreAddons.push_back("ofxDirList");
-    coreAddons.push_back("ofxNetwork");
-    coreAddons.push_back("ofxOpenCv");
-    coreAddons.push_back("ofxOsc");
-    coreAddons.push_back("ofxThread");
-    coreAddons.push_back("ofxThreadedImageLoader");
-    coreAddons.push_back("ofxVectorGraphics");
-    coreAddons.push_back("ofxVectorMath");
-    coreAddons.push_back("ofxXmlSettings");
-    coreAddons.push_back("ofxSvg");
-    
     // Load Addons into panels
     //
-    coreAddonsList.set(0,0,400,0);
+    coreAddonsList.set(64,12,350,500);
     coreAddonsList.font = &font;
-    otherAddonsList.set(410,0,400,0);
+    coreAddonsList.title = "Core Addons";
+    otherAddonsList.set(coreAddonsList.x*2+coreAddonsList.width,coreAddonsList.y,coreAddonsList.width,coreAddonsList.height);
     otherAddonsList.font = &font;
+    otherAddonsList.title = "Non-Core Addons";
     
     ofDirectory addonsFolder(addonsPath);
     addonsFolder.listDir();
@@ -308,7 +282,22 @@ void testApp::loadAddons(){
 
 //------------------------------------------------------
 bool testApp::isAddonCore(string addon){
-
+    //  Pre define what's a core addon
+    //
+    vector<string>  coreAddons;
+    coreAddons.push_back("ofx3DModelLoader");
+    coreAddons.push_back("ofxAssimpModelLoader");
+    coreAddons.push_back("ofxDirList");
+    coreAddons.push_back("ofxNetwork");
+    coreAddons.push_back("ofxOpenCv");
+    coreAddons.push_back("ofxOsc");
+    coreAddons.push_back("ofxThread");
+    coreAddons.push_back("ofxThreadedImageLoader");
+    coreAddons.push_back("ofxVectorGraphics");
+    coreAddons.push_back("ofxVectorMath");
+    coreAddons.push_back("ofxXmlSettings");
+    coreAddons.push_back("ofxSvg");
+    
     for (int i = 0; i < coreAddons.size(); i++){
         if (coreAddons[i] == addon){
             return true;
@@ -376,6 +365,7 @@ string testApp::setTarget(int targ){
     if(project){
 		delete project;
 	}
+    
     string target;
     switch(targ){
         case OF_TARGET_OSX:
@@ -419,12 +409,25 @@ void testApp::setStatus(string newStatus){
 void testApp::generateProject(){
     
     vector <int> targetsToMake;
-	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
-	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IPHONE);
-	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
-	if( winvsToggle )	targetsToMake.push_back(OF_TARGET_WINVS);
-	if( linuxcbToggle )	targetsToMake.push_back(OF_TARGET_LINUX);
-	if( linux64cbToggle )	targetsToMake.push_back(OF_TARGET_LINUX64);
+    for(int i = 0; i < platformsList.elements.size(); i++){
+        if ( *(platformsList.elements[i]) == true ){
+            if (platformsList.elements[i]->text == "windows (codeblocks)" ){
+                targetsToMake.push_back(OF_TARGET_WINGCC);
+            } else if (platformsList.elements[i]->text == "windows (visualStudio)"){
+                targetsToMake.push_back(OF_TARGET_WINVS);
+            } else if (platformsList.elements[i]->text == "linux (codeblocks)"){
+                targetsToMake.push_back(OF_TARGET_LINUX);
+            } else if (platformsList.elements[i]->text == "linux64 (codeblocks)"){
+                targetsToMake.push_back(OF_TARGET_LINUX64);
+            } else if (platformsList.elements[i]->text == "osx (xcode)"){
+                targetsToMake.push_back(OF_TARGET_OSX);
+            } else if (platformsList.elements[i]->text == "ios (xcode)"){
+                targetsToMake.push_back(OF_TARGET_IPHONE);
+            }
+        }
+    }
+    
+    cout << targetsToMake.size() << endl;
     
 	if( targetsToMake.size() == 0 ){
 		cout << "Error: makeNewProjectViaDialog - must specifiy a project to generate " <<endl;
@@ -464,18 +467,18 @@ void testApp::generateProject(){
             
             project->save(true);
         }
+        
+        setStatus("generated: " + buttons[1].text + "/" + buttons[0].text + " for " + platformsList.getSelected()[i]);
 	}
     
-    
     printf("done with project generation \n");
-    setStatus("generated: " + buttons[1].text + "/" + buttons[0].text);
-    
     // go through the control panels, do stuff
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-
+    ofPoint mouse = ofPoint(mouseX, mouseY);
+    
     float diff = ofGetElapsedTimef()- statusSetTime;
     if (diff > 3){
         statusEnergy *= 0.99;;
@@ -487,10 +490,10 @@ void testApp::update(){
     if (mode == MODE_NORMAL){
         for (int i = 0; i < buttons.size(); i++){
             buttons[i].calculateRect();
-            buttons[i].checkMousePressed(ofPoint(mouseX, mouseY));
+            buttons[i].checkMousePressed(mouse);
         }
         
-        generateButton.checkMousePressed(ofPoint(mouseX, mouseY));
+        generateButton.checkMousePressed(mouse);
         
         for (int i = 0; i < buttons.size(); i++){
             if (i != 0){
@@ -499,22 +502,14 @@ void testApp::update(){
         }
         
     } else if (mode == MODE_ADDON ){
-        addonButton.checkMousePressed(ofPoint(mouseX, mouseY));
-        
-        if (coreAddonsList.inside(ofGetMouseX(),ofGetMouseY()) && coreAddonsList.height > ofGetHeight()){
-            float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
-            float diff = coreAddonsList.height - ofGetHeight();
-            coreAddonsList.y = -diff * pct;
-        }
-        
-        if (otherAddonsList.inside(ofGetMouseX(),ofGetMouseY()) && otherAddonsList.height > ofGetHeight()){
-            float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
-            float diff = otherAddonsList.height - ofGetHeight();
-            otherAddonsList.y = -diff * pct;
-        }
+        backButton.checkMousePressed(mouse);
         
         coreAddonsList.update();
         otherAddonsList.update();
+    } else if (mode == MODE_PLATFORM){
+        backButton.checkMousePressed(mouse);
+        
+        platformsList.update();
     }
 
 }
@@ -536,29 +531,26 @@ void testApp::draw(){
         
         generateButton.draw();
         
-        ofFill();
-        ofSetColor(0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy));
-        ofRect(0,ofGetHeight(), ofGetWidth(), -25);
-        ofSetColor(255,255,255, 255 * statusEnergy);
-        ofDrawBitmapString(status, 10,ofGetHeight()-8);
-        
     } else if (mode == MODE_ADDON){
         coreAddonsList.draw();
         if (bHaveNonCoreAddons){
             otherAddonsList.draw();
         }
         
-        addonButton.draw();
-        
-        ofRectangle rect = secondFont.getStringBoundingBox("select core and non-core addons to add", addonButton.topLeftAnchor.x-200, 60);
-        ofSetColor(220,220,220);
-        ofRect(rect.x-10, rect.y-10, rect.width+20, rect.height+20);
-        ofSetColor(0,0,0);
-        secondFont.drawString("select core and non-core addons to add", addonButton.topLeftAnchor.x-200, 60);
+        backButton.draw();
         
     } else if (mode == MODE_PLATFORM){
-        panelPlatforms.draw();
+        
+        platformsList.draw();
+        
+        backButton.draw();
     }
+    
+    ofFill();
+    ofSetColor(0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy));
+    ofRect(0,ofGetHeight(), ofGetWidth(), -25);
+    ofSetColor(255,255,255, 255 * statusEnergy);
+    ofDrawBitmapString(status, 10,ofGetHeight()-8);
 }
 
 //--------------------------------------------------------------
@@ -630,7 +622,7 @@ void testApp::mousePressed(int x, int y, int button){
         //-------------------------------------
         if (buttons[2].bMouseOver == true){
             // platform is diabled for now
-             mode = 2;
+             mode = MODE_PLATFORM;
         }
 
         //-------------------------------------
@@ -658,54 +650,27 @@ void testApp::mousePressed(int x, int y, int button){
         // if we hit he back button, collect the addons for display
         //-------------------------------------
 
-        if (addonButton.bMouseOver){
-//            string addons = "";
-//            for (int i = 0; i < panelCoreAddons.getNumControls(); i++){
-//                if (*((ofxToggle *)panelCoreAddons.getControl(i))){
-//                   if (addons.length() > 0) addons+=", ";
-//                    addons += ((ofxToggle *)panelCoreAddons.getControl(i))->getName();
-//
-//                }
-//
-//            }
-//            
-//            for (int i = 0; i < panelOtherAddons.getNumControls(); i++){
-//                if (*((ofxToggle *)panelOtherAddons.getControl(i))){
-//                    if (addons.length() > 0) addons+=", ";
-//                    addons += ((ofxToggle *)panelOtherAddons.getControl(i))->getName();
-//
-//                }
-//
-//            }
-            string addons = "";
-            
-            vector<string> sAddons = coreAddonsList.getSelected();
-            for(int i = 0; i < sAddons.size(); i++){
-                if (addons.length() > 0)
-                    addons += ", ";
-                
-                addons += sAddons[i];
-            }
-            
-            sAddons = otherAddonsList.getSelected();
-            for(int i = 0; i < sAddons.size(); i++){
-                if (addons.length() > 0)
-                    addons += ", ";
-                
-                addons += sAddons[i];
-            }
-            
+        if (backButton.bMouseOver){
+            string addons = coreAddonsList.getSelectedAsString() + otherAddonsList.getSelectedAsString();
             buttons[3].setText(addons);
-
             setStatus("addons set to: " + addons);
 
-            addonButton.bMouseOver = false;
+            backButton.bMouseOver = false;
             mode = MODE_NORMAL;
         }
     }
 
     if (mode == MODE_PLATFORM){
-
+        platformsList.checkMousePressed(mouse);
+        
+        if (backButton.bMouseOver){
+            string platforms = platformsList.getSelectedAsString();
+            buttons[2].setText( platforms );
+            setStatus("Platform targets set to: " + platforms);
+            
+            backButton.bMouseOver = false;
+            mode = MODE_NORMAL;
+        }
     }
 }
 
@@ -719,8 +684,8 @@ void testApp::windowResized(int w, int h){
     generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - generateButton.width + 10, ofGetHeight() - generateButton.height - 40);// 535);
     generateButton.calculateRect();
     
-    addonButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - addonButton.width + 10, ofGetHeight() - addonButton.height - 40);// 535);
-    addonButton.calculateRect();
+    backButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - backButton.width + 10, ofGetHeight() - backButton.height - 40);// 535);
+    backButton.calculateRect();
 }
 
 //--------------------------------------------------------------

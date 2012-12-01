@@ -31,56 +31,38 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
  
-    //  Project
-    //
     void    loadProject(string _path);
-    string  setTarget(int targ);
-    void    generateProject();
-    
-    string  appToRoot;
-    string  defaultLoc;
-    string  addonsPath;
-    
-    baseProject *project;
-    
-    //  Addons
-    //
     void    loadAddons();
     bool    selectAddon(string _addonName);
     bool    isAddonCore(string _addonName);
-    vector<string> coreAddons;
+    string  setTarget(int targ);
+    void    setStatus(string newStatus);
+    void    generateProject();
     
-    //  GUI
-    //
-    int mode;
-    enum { MODE_NORMAL, MODE_ADDON, MODE_PLATFORM };
+    ofImage         logo;
+    ofTrueTypeFont  font;
+    ofTrueTypeFont  titleFont;
+    ofTrueTypeFont  secondFont;
     
-    ofxPanel        panelPlatforms;
-    ofxToggle       osxToggle, iosToggle, wincbToggle, winvsToggle, linuxcbToggle, linux64cbToggle;
-    
-//    ofxPanel        panelCoreAddons;
-//    ofxPanel        panelOtherAddons;
+    checkList       platformsList;
     checkList       coreAddonsList;
     checkList       otherAddonsList;
-    bool            bHaveNonCoreAddons;
     
     vector<textButton> buttons;
-    textButton      addonButton;
+    textButton      backButton;
     textButton      generateButton;
     
-    //  Status
-    //
-    string  status;
-    float   statusSetTime;
-    float   statusEnergy;
-    void    setStatus(string newStatus);
+    string      appToRoot;
+    string      defaultLoc;
+    string      addonsPath;
     
-    //  Design
-    //
-    ofImage logo;
-    ofTrueTypeFont font;
-    ofTrueTypeFont titleFont;
-    ofTrueTypeFont secondFont;
-		
-    float uiLeftX;
+    string      status;
+    float       statusSetTime;
+    float       statusEnergy;
+    
+    baseProject *project;
+    int         mode;
+    enum { MODE_NORMAL, MODE_ADDON, MODE_PLATFORM };
+    
+    bool        bHaveNonCoreAddons;
 };

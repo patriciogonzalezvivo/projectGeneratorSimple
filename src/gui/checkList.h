@@ -16,9 +16,10 @@ class checkList : public ofRectangle {
 public:
     checkList();
     
-    void    addElement(string _value);
+    void    addElement(string _value, bool _defVal = false);
     bool    select(string _value);
     vector<string>  getSelected();
+    string  getSelectedAsString();
     
     void    clear();
     void    reset();
@@ -30,7 +31,13 @@ public:
     vector<checkButton*> elements;
     ofTrueTypeFont * font;
 
+    float   damp;
     float   elementHeight;
+    string  title;
+    string  divisor;
+    
+private:
+    float   mouseOffSet;
 };
 
 #endif /* defined(__projectGenerator__checkList__) */
