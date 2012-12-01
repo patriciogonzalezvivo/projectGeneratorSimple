@@ -60,7 +60,7 @@ bool isProjectFolder(string &_projFolder){
         //
         string folder;
         extractFolderFromPath(searchFor, folder);
-        if ( (folder == "src") || (folder == "bin") || folder.find(".xcodeproj") ){
+        if ( (folder == "src") || (folder == "bin") || ( (int)folder.find(".xcodeproj") > 0) ){
             _projFolder = searchFor;
         } else {
             searchFor = _projFolder;
@@ -72,7 +72,12 @@ bool isProjectFolder(string &_projFolder){
         //
         string name;
         extractFolderFromPath(searchFor, name);
-        if ( name.find(".cbp") || name.find(".workspace") || name.find(".plist") || name.find(".xcconfig")  || name.find(".make") || name.find(".vcxproj") ){
+        if (((int)name.find(".cbp") > 0) ||
+            ((int)name.find(".workspace") > 0) ||
+            ((int)name.find(".plist") > 0) ||
+            ((int)name.find(".xcconfig") > 0) ||
+            ((int)name.find(".make") > 0) ||
+            ((int)name.find(".vcxproj") > 0 )){
             _projFolder = searchFor;
         } else {
             return false;
@@ -267,7 +272,7 @@ void testApp::loadAddons(){
     
     ofDirectory addonsFolder(addonsPath);
     addonsFolder.listDir();
-    for(int i=0;i<(int)addonsFolder.size();i++){
+    for(int i=0; i < (int)addonsFolder.size();i++){
     	string addonName = addonsFolder.getName(i);
         
     	if(addonName.find("ofx")==0){

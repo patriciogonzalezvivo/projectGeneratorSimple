@@ -138,7 +138,7 @@ void checkList::draw(){
     ofRectangle rect = *this;
     if (title != ""){
         rect.y      += elementHeight*0.5;
-        rect.height -= elementHeight*1.2;
+        rect.height -= elementHeight;
     }
         
     for(int i = 0; i < elements.size(); i++){
