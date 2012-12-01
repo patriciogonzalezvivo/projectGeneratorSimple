@@ -9,7 +9,6 @@
 #include "xcodeProject.h"
 #include <Poco/Path.h>
 
-#include "ofxGui.h"
 #include "ofxXmlSettings.h"
 
 #include "textButton.h"
@@ -48,7 +47,7 @@ public:
     checkList       coreAddonsList;
     checkList       otherAddonsList;
     
-    vector<textButton> buttons;
+    vector<textButton*> buttons;
     textButton      backButton;
     textButton      generateButton;
     

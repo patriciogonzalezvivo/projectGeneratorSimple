@@ -158,72 +158,73 @@ void testApp::setup(){
     
     //  Sketch button
     //
-    textButton  button;
-    button.font = &font;
-    button.secondFont = &secondFont;
-    button.prefix = "Name: ";
-	button.topLeftAnchor.set(margin+12, 160+40); //set top button position - others are set relative to this.
-    button.setText(sketchName);
-    button.secondaryText = "<< CLICK TO CHANGE THE NAME";
-    buttons.push_back(button);
+    textButton  *buttonName = new textButton();
+    buttonName->font = &font;
+    buttonName->secondFont = &secondFont;
+    buttonName->prefix = "Name: ";
+    buttonName->enableEditing();
+	buttonName->topLeftAnchor.set(margin+12, 160+40); //set top button position - others are set relative to this.
+    buttonName->setText(sketchName);
+    buttonName->secondaryText = "<< CLICK TO CHANGE THE NAME";
+    buttons.push_back(buttonName);
     
-    //  Path button
+    //  Path Button
     //
-    button.deliminater = "/";
-    button.prefix = "Path: ";
-    button.setText(sketchPath);
-    button.secondaryText = "<< CLICK TO CHANGE THE DIRECTORY";
-	button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.height + 20);
-    buttons.push_back(button);
+    textButton  *buttonPath = new textButton();
+    buttonPath->font = &font;
+    buttonPath->secondFont = &secondFont;
+    buttonPath->topLeftAnchor.set(buttons[ buttons.size() -1 ]->topLeftAnchor.x, buttons[ buttons.size() -1 ]->topLeftAnchor.y + buttons[ buttons.size() -1 ]->height + 20);
+    buttonPath->deliminater = "/";
+    buttonPath->prefix = "Path: ";
+    buttonPath->setText(sketchPath);
+    buttonPath->secondaryText = "<< CLICK TO CHANGE THE DIRECTORY";
+    buttons.push_back(buttonPath);
     
-    //  Platform text
+    //  Platform Button
     //
-    button.deliminater = ", ";
-    button.prefix = "Platforms: ";
-    button.secondaryText = "";
-    button.secondaryText = "<< CLICK TO CHANGE THE PLATFORM";
-//    button.bSelectable = false;
-    button.setText("");
+    textButton  *buttonPlat = new textButton();
+    buttonPlat->font = &font;
+    buttonPlat->secondFont = &secondFont;
+    buttonPlat->topLeftAnchor.set(buttons[ buttons.size() -1 ]->topLeftAnchor.x, buttons[ buttons.size() -1 ]->topLeftAnchor.y + buttons[ buttons.size() -1 ]->height + 20);
+    buttonPlat->deliminater = ", ";
+    buttonPlat->prefix = "Platforms: ";
+    buttonPlat->secondaryText = "<< CLICK TO CHANGE THE PLATFORM";
+    buttonPlat->setText("");
+    buttons.push_back(buttonPlat);
     
-    button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.height + 20);
-    buttons.push_back(button);
-    
-    //  Addons button
+    //  Addons Button
     //
-    button.deliminater = ", ";
-    button.bDrawLong = true;
-    button.prefix = "Addons: ";
-    button.secondaryText = "<< CLICK TO SELECT ADDONS";
-    button.bSelectable = true;
-    button.setText("");
-    
-    button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.height + 20);
-    buttons.push_back(button);
+    textButton  *buttonAddon = new textButton();
+    buttonAddon->font = &font;
+    buttonAddon->secondFont = &secondFont;
+    buttonAddon->topLeftAnchor.set(buttons[ buttons.size() -1 ]->topLeftAnchor.x, buttons[ buttons.size() -1 ]->topLeftAnchor.y + buttons[ buttons.size() -1 ]->height + 20);
+    buttonAddon->deliminater = ", ";
+    buttonAddon->prefix = "Addons: ";
+    buttonAddon->secondaryText = "<< CLICK TO SELECT ADDONS";
+    buttonAddon->setText("");
+    buttons.push_back(buttonAddon);
     
     for (int i = 0; i < buttons.size(); i++){
-        buttons[i].calculateRect();
+        buttons[i]->calculateRect();
     }
     
     //  Generate Button
     //
-    generateButton = button;
-    generateButton.topLeftAnchor.set(906, 535);
+    generateButton.font = &font;
+    generateButton.secondFont = &secondFont;
     generateButton.deliminater = ",";
     generateButton.prefix = "GENERATE PROJECT";
-    generateButton.bSelectable = true;
     generateButton.setText("");
     generateButton.bDrawLong = false;
-    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - generateButton.width + 10 , ofGetHeight() - generateButton.height - 40);
+    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0]->x - generateButton.width + 10 , ofGetHeight() - generateButton.height - 40);
     generateButton.calculateRect();
     
     //  Addon Button
     //
-    backButton = button;
-    backButton.topLeftAnchor.set(906, 535);
+    backButton = generateButton;
     backButton.prefix = "BACK >>";
     backButton.setText("");
     backButton.bDrawLong = false;
-    backButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - backButton.width + 10 , ofGetHeight() - backButton.height - 40);
     backButton.calculateRect();
     
     //  LOAD ADDONS
@@ -251,7 +252,7 @@ void testApp::setup(){
     
     // update the platforms text in the platform button
     //
-    buttons[2].setText( platformsList.getSelectedAsString() );
+    buttons[2]->setText( platformsList.getSelectedAsString() );
 }
 
 void testApp::loadAddons(){
@@ -312,8 +313,8 @@ void testApp::loadProject(string _path){
     string folder = "";
     
     extractFolderFromPath(_path,folder);
-    buttons[0].setText(folder);
-    buttons[1].setText(_path);
+    buttons[0]->setText(folder);
+    buttons[1]->setText(_path);
     setStatus("Project " + folder + " loaded ");
     
     //  Extracting Addons ( from addons.make)
@@ -349,7 +350,7 @@ void testApp::loadProject(string _path){
     fs.clear();
     fs.close();
     
-    buttons[3].setText(addonsAdded);
+    buttons[3]->setText(addonsAdded);
 }
 
 bool testApp::selectAddon(string _addonName){
@@ -435,14 +436,14 @@ void testApp::generateProject(){
         return;
 	}
     
-    if (buttons[0].text.size() == 0){
+    if (buttons[0]->text.size() == 0){
         ofSystemAlertDialog("Error: project must have a name");
         return;
     }
     
     printf("start with project generation \n");
     
-    string path = ofFilePath::join(buttons[1].text, buttons[0].text);
+    string path = ofFilePath::join(buttons[1]->text, buttons[0]->text);
     
 	for(int i = 0; i < (int)targetsToMake.size(); i++){
 		string target = setTarget(targetsToMake[i]);
@@ -468,7 +469,7 @@ void testApp::generateProject(){
             project->save(true);
         }
         
-        setStatus("generated: " + buttons[1].text + "/" + buttons[0].text + " for " + platformsList.getSelected()[i]);
+        setStatus("generated: " + buttons[1]->text + "/" + buttons[0]->text + " for " + platformsList.getSelected()[i]);
 	}
     
     printf("done with project generation \n");
@@ -489,15 +490,15 @@ void testApp::update(){
 
     if (mode == MODE_NORMAL){
         for (int i = 0; i < buttons.size(); i++){
-            buttons[i].calculateRect();
-            buttons[i].checkMousePressed(mouse);
+            buttons[i]->calculateRect();
+            buttons[i]->checkMousePressed(mouse);
         }
         
         generateButton.checkMousePressed(mouse);
         
         for (int i = 0; i < buttons.size(); i++){
             if (i != 0){
-                buttons[i].topLeftAnchor.y = buttons[i-1].topLeftAnchor.y + buttons[i-1].height + 20;
+                buttons[i]->topLeftAnchor.y = buttons[i-1]->topLeftAnchor.y + buttons[i-1]->height + 20;
             }
         }
         
@@ -526,7 +527,7 @@ void testApp::draw(){
         titleFont.drawString("GENERATOR",  64 + logo.getWidth() + 25, 117);
     
 		for (int i = 0; i < buttons.size(); i++){
-			buttons[i].draw();
+			buttons[i]->draw();
 		}
         
         generateButton.draw();
@@ -575,23 +576,23 @@ void testApp::mousePressed(int x, int y, int button){
     if (mode == MODE_NORMAL){
 
         for (int i = 0; i < buttons.size(); i++){
-            buttons[i].checkMousePressed(mouse);
+            buttons[i]->checkMousePressed(mouse);
         }
         
         //-------------------------------------
         // 0 = sketch name
         //-------------------------------------
-        if (buttons[0].bMouseOver == true){
-            string text = ofSystemTextBoxDialog("choose sketch name", buttons[0].text);
-            fixStringCharacters(text);
-            setStatus("sketch name set to: " + text);
-            buttons[0].setText(text);
-        }
+//        if (buttons[0].bMouseOver == true){
+//            string text = ofSystemTextBoxDialog("choose sketch name", buttons[0].text);
+//            fixStringCharacters(text);
+//            setStatus("sketch name set to: " + text);
+//            buttons[0].setText(text);
+//        }
 
         //-------------------------------------
         // 1 = sketch path
         //-------------------------------------
-        if (buttons[1].bMouseOver == true){
+        if (buttons[1]->bMouseOver == true){
 
             string command = "";
 
@@ -611,7 +612,7 @@ void testApp::mousePressed(int x, int y, int button){
             if (res.bSuccess){
                 string result = res.filePath;
                 convertWindowsToUnixPath(result);
-                buttons[1].setText( result );
+                buttons[1]->setText( result );
                 
                 setStatus("path set to: " + result);
             }
@@ -620,7 +621,7 @@ void testApp::mousePressed(int x, int y, int button){
         //-------------------------------------
         // 2 = platform  (disabled)
         //-------------------------------------
-        if (buttons[2].bMouseOver == true){
+        if (buttons[2]->bMouseOver == true){
             // platform is diabled for now
              mode = MODE_PLATFORM;
         }
@@ -628,7 +629,7 @@ void testApp::mousePressed(int x, int y, int button){
         //-------------------------------------
         // 3 = addon
         //-------------------------------------
-        if (buttons[3].bMouseOver == true){
+        if (buttons[3]->bMouseOver == true){
             mode = MODE_ADDON;
         }
         
@@ -652,7 +653,7 @@ void testApp::mousePressed(int x, int y, int button){
 
         if (backButton.bMouseOver){
             string addons = coreAddonsList.getSelectedAsString() + otherAddonsList.getSelectedAsString();
-            buttons[3].setText(addons);
+            buttons[3]->setText(addons);
             setStatus("addons set to: " + addons);
 
             backButton.bMouseOver = false;
@@ -665,7 +666,7 @@ void testApp::mousePressed(int x, int y, int button){
         
         if (backButton.bMouseOver){
             string platforms = platformsList.getSelectedAsString();
-            buttons[2].setText( platforms );
+            buttons[2]->setText( platforms );
             setStatus("Platform targets set to: " + platforms);
             
             backButton.bMouseOver = false;
@@ -681,10 +682,10 @@ void testApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
-    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - generateButton.width + 10, ofGetHeight() - generateButton.height - 40);// 535);
+    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0]->x - generateButton.width + 10, ofGetHeight() - generateButton.height - 40);// 535);
     generateButton.calculateRect();
     
-    backButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - backButton.width + 10, ofGetHeight() - backButton.height - 40);// 535);
+    backButton.topLeftAnchor.set(ofGetWidth() - buttons[0]->x - backButton.width + 10, ofGetHeight() - backButton.height - 40);// 535);
     backButton.calculateRect();
 }
 
