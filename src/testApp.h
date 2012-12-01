@@ -1,8 +1,8 @@
 #pragma once
 
-//#define COMMAND_LINE_ONLY
-
 #include "ofMain.h"
+
+#include "ofAddon.h"
 #include "CBLinuxProject.h"
 #include "CBWinProject.h"
 #include "visualStudioProject.h"
@@ -10,9 +10,10 @@
 #include <Poco/Path.h>
 
 #include "ofxGui.h"
-#include "ofAddon.h"
 #include "ofxXmlSettings.h"
+
 #include "textButton.h"
+#include "checkList.h"
 
 class testApp : public ofBaseApp{
 public:
@@ -32,19 +33,22 @@ public:
  
     //  Project
     //
-    string  setupForTarget(int targ);
     void    loadProject(string _path);
+    string  setTarget(int targ);
     void    generateProject();
-    
-    bool    isAddonCore(string addon);
-    bool    bInited;
-    vector<string> coreAddons;
     
     string  appToRoot;
     string  defaultLoc;
     string  addonsPath;
     
     baseProject *project;
+    
+    //  Addons
+    //
+    void    loadAddons();
+    bool    selectAddon(string _addonName);
+    bool    isAddonCore(string _addonName);
+    vector<string> coreAddons;
     
     //  GUI
     //
@@ -54,8 +58,10 @@ public:
     ofxPanel        panelPlatforms;
     ofxToggle       osxToggle, iosToggle, wincbToggle, winvsToggle, linuxcbToggle, linux64cbToggle;
     
-    ofxPanel        panelCoreAddons;
-    ofxPanel        panelOtherAddons;
+//    ofxPanel        panelCoreAddons;
+//    ofxPanel        panelOtherAddons;
+    checkList       coreAddonsList;
+    checkList       otherAddonsList;
     bool            bHaveNonCoreAddons;
     
     vector<textButton> buttons;

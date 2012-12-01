@@ -16,37 +16,22 @@ string windowsFromUnixPath(string path){
 	return path;
 }
 
-//------------------------------------------------------
-bool testApp::isAddonCore(string addon){
-
-    if (bInited == false){
-        coreAddons.push_back("ofx3DModelLoader");
-        coreAddons.push_back("ofxAssimpModelLoader");
-        coreAddons.push_back("ofxDirList");
-        coreAddons.push_back("ofxNetwork");
-        coreAddons.push_back("ofxOpenCv");
-        coreAddons.push_back("ofxOsc");
-        coreAddons.push_back("ofxThread");
-        coreAddons.push_back("ofxThreadedImageLoader");
-        coreAddons.push_back("ofxVectorGraphics");
-        coreAddons.push_back("ofxVectorMath");
-        coreAddons.push_back("ofxXmlSettings");
-        coreAddons.push_back("ofxSvg");
-        bInited = true;
+void extractFolderFromPath(string &_path, string &_folder){
+    string completePath = _path;
+    _folder = "";
+    _path = "";
+    
+    int i;
+    for (i = completePath.size()-1 ; completePath[i] != '/'; i--){
+        _folder.insert(_folder.begin(), completePath[i]);
     }
-
-    for (int i = 0; i < coreAddons.size(); i++){
-        if (coreAddons[i] == addon){
-            return true;
-        }
+    for (i-- ; completePath[i] >= 0; i--){
+        _path.insert(_path.begin(), completePath[i]);
     }
-    return false;
 }
 
-//------------------------------------------------------
-// for project names, let's fix replace any odd characters with _
 void fixStringCharacters(string &toFix){
-
+    
     // replace all non alpha numeric (ascii) characters with _
     for (int i = 0; i < toFix.size(); i++){
         int which = (int)toFix[i];
@@ -59,11 +44,335 @@ void fixStringCharacters(string &toFix){
     }
 }
 
+bool isProjectFolder(string &_projFolder){
+    //  Return true or false if a project Folder structure it's found and change the _projFolder string
+    //  to become the correct path to a folder structure
+    //
+    
+    //  1. If is a directory
+    //
+    ofDirectory dir;
+    string searchFor = _projFolder;
+    dir.open(searchFor);
+    if ( dir.isDirectory() ){
+        
+        //  Is a project directory or a src directory?
+        //
+        string folder;
+        extractFolderFromPath(searchFor, folder);
+        if ( (folder == "src") || (folder == "bin") || folder.find(".xcodeproj") ){
+            _projFolder = searchFor;
+        } else {
+            searchFor = _projFolder;
+        }
+        
+    } else {
+        
+        //  If is a file it have something related to a project?
+        //
+        string name;
+        extractFolderFromPath(searchFor, name);
+        if ( name.find(".cbp") || name.find(".workspace") || name.find(".plist") || name.find(".xcconfig")  || name.find(".make") || name.find(".vcxproj") ){
+            _projFolder = searchFor;
+        } else {
+            return false;
+        }
+    }
+    
+    //  3. Have src/
+    //
+    searchFor = searchFor+"/src";
+    dir.open( searchFor );
+    if (!dir.isDirectory())
+        return false;
+    
+    //  4. Have main.cpp, testApp.h, testApp.cpp?
+    //
+    ofFile test;
+    bool    isMainCpp = test.open(searchFor+"/main.cpp");
+    bool    isTestAppH = test.open(searchFor+"/testApp.h");
+    bool    isTestAppCpp = test.open(searchFor+"/testApp.cpp");
+    
+    if ( !(isMainCpp && isTestAppH && isTestAppCpp) )
+        return false;
+    
+    return true;
+}
 
+//--------------------------------------------------------------
+void testApp::setup(){
+    ofEnableAlphaBlending();
+    ofEnableSmoothing();
+    ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetVerticalSync(true);
+    
+    //  Default Settings
+    //
+    mode                = MODE_NORMAL;
+    project             = NULL;
+    statusEnergy        = 0;
+    string sketchName   = "mySketch";
+    
+    ofBackground(230,230,230);
+    logo.loadImage("images/ofw-logo.png");
+    
+    //  XML Settings
+    //
+    ofxXmlSettings XML;
+    XML.loadFile("settings/projectGeneratorSettings.xml");
+    appToRoot = XML.getValue("appToRoot", "../../../../");
+    defaultLoc = XML.getValue("defaultNewProjectLocation", "apps/myApps");
+    
+    //-------------------------------------
+    // calculate the bin path (../../../ on osx) and the sketch path (bin -> root - > defaultLoc)
+    //-------------------------------------
+    // if appToRoot is wrong, we have alot of issues.  all these paths are used in this project:
+    //
+#ifdef TARGET_OSX
+    string binPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofFilePath::getCurrentWorkingDirectory(), "../../../"));
+#else
+    string binPath = ofFilePath::getCurrentExeDir();
+#endif
+    
+    string ofRoot = ofFilePath::getAbsolutePath(ofFilePath::join(binPath, appToRoot));
+    addonsPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot,"addons"));
+    string sketchPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot, defaultLoc));
+    
+    convertWindowsToUnixPath(ofRoot);
+    convertWindowsToUnixPath(addonsPath);
+    convertWindowsToUnixPath(sketchPath);
+    
+    // there's some issues internally in OF with non unix paths for OF root
+    //
+    setOFRoot(ofRoot);
+    
+    //------------------------------------- GUI
+    //
+    
+    //  load font and setup the buttons
+    //
+    font.loadFont("fonts/Inconsolata.otf", 14, true,false,false,0.3,90);
+    titleFont.loadFont("fonts/Inconsolata.otf", 28, true,false,false,0.3,90);
+    secondFont.loadFont("fonts/Inconsolata.otf", 11, true,false,false,0.3,90);
+    
+    //  Sketch button
+    //
+    textButton  button;
+    button.font = &font;
+    button.secondFont = &secondFont;
+    button.prefix = "Name: ";
+	button.topLeftAnchor.set(76, 160+40); //set top button position - others are set relative to this.
+    button.setText(sketchName);
+    button.secondaryText = "<< CLICK TO CHANGE THE NAME";
+    buttons.push_back(button);
+    
+    //  Path button
+    //
+    button.deliminater = "/";
+    button.prefix = "Path: ";
+    button.setText(sketchPath);
+    button.secondaryText = "<< CLICK TO CHANGE THE DIRECTORY";
+	button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.height + 20);
+    buttons.push_back(button);
+    
+    //  Platform text
+    //
+    button.deliminater = ", ";
+    button.prefix = "Platforms: ";
+    button.secondaryText = "";
+    button.bDrawLong = false;
+    button.secondaryText = "";
+    button.bSelectable = false;
+    button.setText("");
+    
+    button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.height + 20);
+    buttons.push_back(button);
+    
+    //  Addons button
+    //
+    button.deliminater = ", ";
+    button.bDrawLong = true;
+    button.prefix = "Addons: ";
+    button.secondaryText = "<< CLICK TO SELECT ADDONS";
+    button.bSelectable = true;
+    button.setText("");
+    
+    button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.height + 20);
+    buttons.push_back(button);
+    
+    for (int i = 0; i < buttons.size(); i++){
+        buttons[i].calculateRect();
+    }
+    
+    //  Generate Button
+    //
+    generateButton = button;
+    generateButton.topLeftAnchor.set(906, 535);
+    generateButton.deliminater = ",";
+    generateButton.prefix = "GENERATE PROJECT";
+    generateButton.bSelectable = true;
+    generateButton.setText("");
+    generateButton.bDrawLong = false;
+    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - generateButton.width + 10 , ofGetHeight() - generateButton.height - 40);
+    generateButton.calculateRect();
+    
+    //  Addon Button
+    //
+    addonButton = button;
+    addonButton.topLeftAnchor.set(906, 535);
+    addonButton.prefix = "<< BACK";
+    addonButton.setText("");
+    addonButton.bDrawLong = false;
+    addonButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - addonButton.width + 10 , ofGetHeight() - addonButton.height - 40);
+    addonButton.calculateRect();
+    
+    //  LOAD ADDONS
+    //
+    loadAddons();
+    
+    //-------------------------------------
+    // platform panel (not used, really, but here just in case)
+    //-------------------------------------
+    
+    panelPlatforms.setup();
+    panelPlatforms.add(wincbToggle.setup("windows (codeblocks)",ofGetTargetPlatform()==OF_TARGET_WINGCC));
+	panelPlatforms.add(winvsToggle.setup("windows (visualStudio)", ofGetTargetPlatform()==OF_TARGET_WINVS));
+	panelPlatforms.add(linuxcbToggle.setup("linux (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX));
+	panelPlatforms.add(linux64cbToggle.setup("linux64 (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX64));
+    
+    //for ios, we need to fake that the target is ios (since we're compiling w/ osx OF)
+    
+    //#define MAKE_IOS
+    
+#ifdef MAKE_IOS
+	panelPlatforms.add(osxToggle.setup("osx (xcode)",false));
+	panelPlatforms.add(iosToggle.setup("ios (xcode)",true));
+#else
+    panelPlatforms.add(osxToggle.setup("osx (xcode)",ofGetTargetPlatform()==OF_TARGET_OSX));
+	panelPlatforms.add(iosToggle.setup("ios (xcode)",ofGetTargetPlatform()==OF_TARGET_IPHONE));
+#endif
+    
+    
+    // update the platforms text in the platform button
+    string platforms = "";
+    for (int i = 0; i < panelPlatforms.getNumControls(); i++){
+        if (*((ofxToggle *)panelPlatforms.getControl(i))){
+            if (platforms.length() > 0) platforms+=", ";
+            platforms += ((ofxToggle *)panelPlatforms.getControl(i))->getName();
+            
+        };
+    }
+    buttons[2].setText(platforms);
+    panelPlatforms.setPosition(10,40);
+}
+
+void testApp::loadAddons(){
+    //  Pre define what's a core addon
+    //
+    coreAddons.clear();
+    coreAddons.push_back("ofx3DModelLoader");
+    coreAddons.push_back("ofxAssimpModelLoader");
+    coreAddons.push_back("ofxDirList");
+    coreAddons.push_back("ofxNetwork");
+    coreAddons.push_back("ofxOpenCv");
+    coreAddons.push_back("ofxOsc");
+    coreAddons.push_back("ofxThread");
+    coreAddons.push_back("ofxThreadedImageLoader");
+    coreAddons.push_back("ofxVectorGraphics");
+    coreAddons.push_back("ofxVectorMath");
+    coreAddons.push_back("ofxXmlSettings");
+    coreAddons.push_back("ofxSvg");
+    
+    // Load Addons into panels
+    //
+    coreAddonsList.set(0,0,400,0);
+    coreAddonsList.font = &font;
+    otherAddonsList.set(410,0,400,0);
+    otherAddonsList.font = &font;
+    
+    ofDirectory addonsFolder(addonsPath);
+    addonsFolder.listDir();
+    for(int i=0;i<(int)addonsFolder.size();i++){
+    	string addonName = addonsFolder.getName(i);
+        
+    	if(addonName.find("ofx")==0){
+            if (isAddonCore(addonName)){
+                coreAddonsList.addElement(addonName);
+            } else {
+                bHaveNonCoreAddons = true;
+                otherAddonsList.addElement(addonName);
+            }
+    	}
+    }
+}
 
 //------------------------------------------------------
-string testApp::setupForTarget(int targ){
+bool testApp::isAddonCore(string addon){
 
+    for (int i = 0; i < coreAddons.size(); i++){
+        if (coreAddons[i] == addon){
+            return true;
+        }
+    }
+    return false;
+}
+
+void testApp::loadProject(string _path){
+    //  Extract Name and Path
+    //
+    string folder = "";
+    
+    extractFolderFromPath(_path,folder);
+    buttons[0].setText(folder);
+    buttons[1].setText(_path);
+    setStatus("Project " + folder + " loaded ");
+    
+    //  Extracting Addons ( from addons.make)
+    //
+    coreAddonsList.reset();
+    otherAddonsList.reset();
+    
+    //  Have addons.make??
+    //
+    ofFile test;
+    bool    isAddons = test.open(_path + "/" + folder + "/addons.make");
+    if ( !isAddons )
+        return;
+    
+    //  Add addons
+    //
+    ifstream fs( (_path + "/" + folder + "/addons.make").c_str());
+    int counter = 0;
+    string line;
+    string addonsAdded = "";
+    while(!(fs >> line).fail()){
+        
+        if ( selectAddon(line) ){
+            if (counter > 0)
+                addonsAdded +=", ";
+            addonsAdded += line;
+        } else {
+            cout << "Error: loading " << line << endl;
+        }
+        counter++;
+    }
+    fs.seekg(0,ios::beg);
+    fs.clear();
+    fs.close();
+    
+    buttons[3].setText(addonsAdded);
+}
+
+bool testApp::selectAddon(string _addonName){
+    if ( isAddonCore(_addonName)){
+        coreAddonsList.select(_addonName);
+    } else {
+        otherAddonsList.select(_addonName);
+    }
+}
+
+string testApp::setTarget(int targ){
+    
     if(project){
 		delete project;
 	}
@@ -96,7 +405,7 @@ string testApp::setupForTarget(int targ){
             target = "linux64";
             break;
     }
-
+    
     project->setup(target);
     return target;
 }
@@ -107,207 +416,61 @@ void testApp::setStatus(string newStatus){
     statusSetTime = ofGetElapsedTimef();
 }
 
-//--------------------------------------------------------------
-void testApp::setup(){
-    ofEnableAlphaBlending();
-    ofEnableSmoothing();
-    ofSetLogLevel(OF_LOG_VERBOSE);
-    ofSetVerticalSync(true);
-
-    statusEnergy = 0;
+void testApp::generateProject(){
     
-    mode = 0;
-    bInited = false;
-    project = NULL;
-    string sketchName = "mySketch";
-	
-
-    //-------------------------------------
-    // get settings
-    //-------------------------------------
-    ofxXmlSettings XML;
-    XML.loadFile("settings/projectGeneratorSettings.xml");
-    appToRoot = XML.getValue("appToRoot", "../../../../");
-    defaultLoc = XML.getValue("defaultNewProjectLocation", "apps/myApps");
+    vector <int> targetsToMake;
+	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
+	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IPHONE);
+	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
+	if( winvsToggle )	targetsToMake.push_back(OF_TARGET_WINVS);
+	if( linuxcbToggle )	targetsToMake.push_back(OF_TARGET_LINUX);
+	if( linux64cbToggle )	targetsToMake.push_back(OF_TARGET_LINUX64);
     
-    //-------------------------------------
-    // calculate the bin path (../../../ on osx) and the sketch path (bin -> root - > defaultLoc)
-    //-------------------------------------
-
-    // if appToRoot is wrong, we have alot of issues.  all these paths are used in this project:
-    //
-#ifdef TARGET_OSX
-    string binPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofFilePath::getCurrentWorkingDirectory(), "../../../"));
-#else
-    string binPath = ofFilePath::getCurrentExeDir();
-#endif
+	if( targetsToMake.size() == 0 ){
+		cout << "Error: makeNewProjectViaDialog - must specifiy a project to generate " <<endl;
+		ofSystemAlertDialog("Error: makeNewProjectViaDialog - must specifiy a project platform to generate");
+        return;
+	}
     
-    string ofRoot = ofFilePath::getAbsolutePath(ofFilePath::join(binPath, appToRoot));
-    addonsPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot,"addons"));
-    string sketchPath = ofFilePath::getAbsolutePath(ofFilePath::join(ofRoot, defaultLoc));
-
-    convertWindowsToUnixPath(ofRoot);
-    convertWindowsToUnixPath(addonsPath);
-    convertWindowsToUnixPath(sketchPath);
-
-    // there's some issues internally in OF with non unix paths for OF root
-    setOFRoot(ofRoot);
-
-    //-------------------------------------
-    // get settings
-    //-------------------------------------
-
-    //-------------------------------------
-    // load font and setup the buttons
-    font.loadFont("fonts/Inconsolata.otf", 14, true,false,false,0.3,90);
-    titleFont.loadFont("fonts/Inconsolata.otf", 28, true,false,false,0.3,90);
-    secondFont.loadFont("fonts/Inconsolata.otf", 11, true,false,false,0.3,90);
-    
-    //  Sketch button
-    //
-    textButton  button;
-    button.font = &font;
-    button.secondFont = &secondFont;
-    button.prefix = "Name: ";
-	button.topLeftAnchor.set(76, 160+40); //set top button position - others are set relative to this.
-    button.setText(sketchName);
-    
-    button.secondaryText = "<< CLICK TO CHANGE THE NAME";
-    buttons.push_back(button);
-
-    //  Path button
-    //
-    button.deliminater = "/";
-    button.prefix = "Path: ";
-    button.setText(sketchPath);
-    button.secondaryText = "<< CLICK TO CHANGE THE DIRECTORY";
-	button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
-    buttons.push_back(button);
-
-    //  Platform text
-    //
-    button.deliminater = ", ";
-    button.prefix = "Platforms: ";
-    button.secondaryText = "";
-    button.bDrawLong = false;
-    button.secondaryText = "";
-    button.bSelectable = false;
-    button.setText("");
-
-    button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
-    buttons.push_back(button);
-
-    //  Addons button
-    //
-    button.deliminater = ", ";
-    button.bDrawLong = true;
-    button.prefix = "Addons: ";
-    button.secondaryText = "<< CLICK TO SELECT ADDONS";
-    button.bSelectable = true;
-    button.setText("");
-
-    button.topLeftAnchor.set(button.topLeftAnchor.x, button.topLeftAnchor.y + button.rect.height + 20);
-    buttons.push_back(button);
-
-    //  Generate
-    //
-    generateButton = button;
-    generateButton.topLeftAnchor.set(906, 535);
-	//generateButton.setColor(ofColor(50, 150, 255));
-    generateButton.deliminater = ",";
-    generateButton.prefix = "GENERATE PROJECT";
-    generateButton.bSelectable = true;
-    generateButton.setText("");
-    generateButton.bDrawLong = false;
-    
-    addonButton = button;
-    addonButton.topLeftAnchor.set(906, 535);
-    addonButton.prefix = "<< BACK";
-    addonButton.setText("");
-    addonButton.bDrawLong = false;
-
-    for (int i = 0; i < buttons.size(); i++){
-        buttons[i].calculateRect();
+    if (buttons[0].text.size() == 0){
+        ofSystemAlertDialog("Error: project must have a name");
+        return;
     }
-    addonButton.calculateRect();
-    generateButton.calculateRect();
-
     
-    // Load Addons into panels
-    //
-    panelCoreAddons.setup();
-    panelOtherAddons.setup();
-
-    ofDirectory addons(addonsPath);
-
-    addons.listDir();
-    for(int i=0;i<(int)addons.size();i++){
-    	string addon = addons.getName(i);
-
-    	if(addon.find("ofx")==0){
-            if (isAddonCore(addon)){
-                ofxToggle * toggle = new ofxToggle();
-                panelCoreAddons.add(toggle->setup(addon,false,300));
-            } else {
-                bHaveNonCoreAddons = true;
-                ofxToggle * toggle = new ofxToggle();
-                panelOtherAddons.add(toggle->setup(addon,false,300));
+    printf("start with project generation \n");
+    
+    string path = ofFilePath::join(buttons[1].text, buttons[0].text);
+    
+	for(int i = 0; i < (int)targetsToMake.size(); i++){
+		string target = setTarget(targetsToMake[i]);
+        
+        if(project->create(path)){
+            
+            vector<string> addons = coreAddonsList.getSelected(); 
+            for (int i = 0; i < addons.size(); i++){
+                ofAddon addon;
+                addon.pathToOF = getOFRelPath(path);
+                addon.fromFS(ofFilePath::join(addonsPath, addons[i]),target);
+                project->addAddon(addon);
             }
-    	}
-    }
-
-    //-------------------------------------
-    // platform panel (not used, really, but here just in case)
-    //-------------------------------------
-
-    panelPlatforms.setup();
-    panelPlatforms.add(wincbToggle.setup("windows (codeblocks)",ofGetTargetPlatform()==OF_TARGET_WINGCC));
-	panelPlatforms.add(winvsToggle.setup("windows (visualStudio)", ofGetTargetPlatform()==OF_TARGET_WINVS));
-	panelPlatforms.add(linuxcbToggle.setup("linux (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX));
-	panelPlatforms.add(linux64cbToggle.setup("linux64 (codeblocks)",ofGetTargetPlatform()==OF_TARGET_LINUX64));
-
-//for ios, we need to fake that the target is ios (since we're compiling w/ osx OF)
-
-//#define MAKE_IOS
-    
-#ifdef MAKE_IOS
-	panelPlatforms.add(osxToggle.setup("osx (xcode)",false));
-	panelPlatforms.add(iosToggle.setup("ios (xcode)",true));
-#else
-    panelPlatforms.add(osxToggle.setup("osx (xcode)",ofGetTargetPlatform()==OF_TARGET_OSX));
-	panelPlatforms.add(iosToggle.setup("ios (xcode)",ofGetTargetPlatform()==OF_TARGET_IPHONE));
-#endif
+            
+            addons = coreAddonsList.getSelected();
+            for (int i = 0; i < addons.size(); i++){
+                ofAddon addon;
+                addon.pathToOF = getOFRelPath(path);
+                addon.fromFS(ofFilePath::join(addonsPath, addons[i]),target);
+                project->addAddon(addon);
+            }
+            
+            project->save(true);
+        }
+	}
     
     
-    // update the platforms text in the platform button
-    string platforms = "";
-    for (int i = 0; i < panelPlatforms.getNumControls(); i++){
-        if (*((ofxToggle *)panelPlatforms.getControl(i))){
-            if (platforms.length() > 0) platforms+=", ";
-            platforms += ((ofxToggle *)panelPlatforms.getControl(i))->getName();
-
-        };
-    }
-    buttons[2].setText(platforms);
-
-
-    panelPlatforms.setPosition(10,40);
-    panelCoreAddons.setPosition(10,40);
-    panelOtherAddons.setPosition(330,40);
-   
-    logo.loadImage("images/ofw-logo.png");
-
-    ofBackground(230,230,230);
+    printf("done with project generation \n");
+    setStatus("generated: " + buttons[1].text + "/" + buttons[0].text);
     
-    
-    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - generateButton.rect.width + 10 ,
-                                     ofGetHeight() - generateButton.rect.height - 40);// 535);
-    generateButton.calculateRect();
-    
-    addonButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - addonButton.rect.width + 10 ,
-                                  ofGetHeight() - addonButton.rect.height - 40);// 535);
-    addonButton.calculateRect();
-
+    // go through the control panels, do stuff
 }
 
 //--------------------------------------------------------------
@@ -321,41 +484,37 @@ void testApp::update(){
     // if we are in addon mode check
     //-------------------------------------
 
-    if (mode == MODE_ADDON )
-        addonButton.checkMousePressed(ofPoint(mouseX, mouseY));
-
-    //-------------------------------------
-    // layout our normal buttons, check the mouse
-    //-------------------------------------
-
-    for (int i = 0; i < buttons.size(); i++){
-        buttons[i].calculateRect();
-        buttons[i].checkMousePressed(ofPoint(mouseX, mouseY));
-    }
-
-    generateButton.checkMousePressed(ofPoint(mouseX, mouseY));
-    
-    for (int i = 0; i < buttons.size(); i++){
-        if (i != 0){
-			buttons[i].topLeftAnchor.y = buttons[i-1].topLeftAnchor.y +buttons[i-1].rect.height + 20;
+    if (mode == MODE_NORMAL){
+        for (int i = 0; i < buttons.size(); i++){
+            buttons[i].calculateRect();
+            buttons[i].checkMousePressed(ofPoint(mouseX, mouseY));
         }
-    }
-
-
-    //-------------------------------------
-    // addons panels can be really long, so use the mouse pos to move them if we need to
-    //-------------------------------------
-
-    if (panelCoreAddons.getShape().height > ofGetHeight()){
-        float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
-        float diff = panelCoreAddons.getShape().height - ofGetHeight();
-        panelCoreAddons.setPosition(panelCoreAddons.getPosition().x,-diff * pct);
-    }
-
-    if (panelOtherAddons.getShape().height > ofGetHeight()){
-        float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
-        float diff = panelOtherAddons.getShape().height - ofGetHeight();
-        panelOtherAddons.setPosition(panelOtherAddons.getPosition().x,-diff * pct);
+        
+        generateButton.checkMousePressed(ofPoint(mouseX, mouseY));
+        
+        for (int i = 0; i < buttons.size(); i++){
+            if (i != 0){
+                buttons[i].topLeftAnchor.y = buttons[i-1].topLeftAnchor.y + buttons[i-1].height + 20;
+            }
+        }
+        
+    } else if (mode == MODE_ADDON ){
+        addonButton.checkMousePressed(ofPoint(mouseX, mouseY));
+        
+        if (coreAddonsList.inside(ofGetMouseX(),ofGetMouseY()) && coreAddonsList.height > ofGetHeight()){
+            float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
+            float diff = coreAddonsList.height - ofGetHeight();
+            coreAddonsList.y = -diff * pct;
+        }
+        
+        if (otherAddonsList.inside(ofGetMouseX(),ofGetMouseY()) && otherAddonsList.height > ofGetHeight()){
+            float pct = ofMap(ofGetMouseY(), 0,ofGetHeight(), 0,1,true);
+            float diff = otherAddonsList.height - ofGetHeight();
+            otherAddonsList.y = -diff * pct;
+        }
+        
+        coreAddonsList.update();
+        otherAddonsList.update();
     }
 
 }
@@ -363,33 +522,32 @@ void testApp::update(){
 //--------------------------------------------------------------
 void testApp::draw(){
     
-    if (mode != MODE_ADDON ) {
+    if (mode == MODE_NORMAL ) {
         
         ofSetColor(100);
         logo.draw(64, 61,logo.getWidth(),logo.getHeight());
         
-        //ofSetColor(74,255,203);
         titleFont.drawString("PROJECT", 64 + logo.getWidth() + 25, 85);
         titleFont.drawString("GENERATOR",  64 + logo.getWidth() + 25, 117);
-    }
     
-	if (mode == 0){
 		for (int i = 0; i < buttons.size(); i++){
 			buttons[i].draw();
 		}
         
         generateButton.draw();
         
-    } else if (mode == 1){
-        panelCoreAddons.draw();
+        ofFill();
+        ofSetColor(0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy));
+        ofRect(0,ofGetHeight(), ofGetWidth(), -25);
+        ofSetColor(255,255,255, 255 * statusEnergy);
+        ofDrawBitmapString(status, 10,ofGetHeight()-8);
+        
+    } else if (mode == MODE_ADDON){
+        coreAddonsList.draw();
         if (bHaveNonCoreAddons){
-            panelOtherAddons.draw();
+            otherAddonsList.draw();
         }
-    } else if (mode == 2){
-        panelPlatforms.draw();
-    }
-    //cout << panelAddons.getShape().height << endl;
-    if (mode == 1 ){
+        
         addonButton.draw();
         
         ofRectangle rect = secondFont.getStringBoundingBox("select core and non-core addons to add", addonButton.topLeftAnchor.x-200, 60);
@@ -397,133 +555,42 @@ void testApp::draw(){
         ofRect(rect.x-10, rect.y-10, rect.width+20, rect.height+20);
         ofSetColor(0,0,0);
         secondFont.drawString("select core and non-core addons to add", addonButton.topLeftAnchor.x-200, 60);
-    }
-    
-    if (mode == 0){
-        ofFill();
-        ofSetColor(0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy),0 + 220 * (1-statusEnergy));
-        ofRect(0,ofGetHeight(), ofGetWidth(), -25);
-        ofSetColor(255,255,255, 255 * statusEnergy);
-        ofDrawBitmapString(status, 10,ofGetHeight()-8);
+        
+    } else if (mode == MODE_PLATFORM){
+        panelPlatforms.draw();
     }
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
-
-    if (key == ' '){
-
-        //printf("%s -------- \n", ResultBuffer);
-        //std::exit(0);
-    }
-
-
-}
-
-void testApp::generateProject(){
-
-    vector <int> targetsToMake;
-	if( osxToggle )		targetsToMake.push_back(OF_TARGET_OSX);
-	if( iosToggle )		targetsToMake.push_back(OF_TARGET_IPHONE);
-	if( wincbToggle )	targetsToMake.push_back(OF_TARGET_WINGCC);
-	if( winvsToggle )	targetsToMake.push_back(OF_TARGET_WINVS);
-	if( linuxcbToggle )	targetsToMake.push_back(OF_TARGET_LINUX);
-	if( linux64cbToggle )	targetsToMake.push_back(OF_TARGET_LINUX64);
-
-	if( targetsToMake.size() == 0 ){
-		cout << "Error: makeNewProjectViaDialog - must specifiy a project to generate " <<endl;
-		ofSystemAlertDialog("Error: makeNewProjectViaDialog - must specifiy a project platform to generate");
-        return;
-	}
-
-    if (buttons[0].myText.size() == 0){
-        ofSystemAlertDialog("Error: project must have a name");
-        return;
-    }
-
-    printf("start with project generation \n");
-
-    string path = ofFilePath::join(buttons[1].myText, buttons[0].myText);
-
-	for(int i = 0; i < (int)targetsToMake.size(); i++){
-		string target = setupForTarget(targetsToMake[i]);
-        
-        if(project->create(path)){
-            vector<string> addonsToggles = panelCoreAddons.getControlNames();
-            for (int i = 0; i < (int) addonsToggles.size(); i++){
-                ofxToggle toggle = panelCoreAddons.getToggle(addonsToggles[i]);
-                if(toggle){
-                    ofAddon addon;
-                    addon.pathToOF = getOFRelPath(path);
-                    addon.fromFS(ofFilePath::join(addonsPath, addonsToggles[i]),target);
-                    project->addAddon(addon);
-
-                }
-            }
-
-            addonsToggles = panelOtherAddons.getControlNames();
-            for (int i = 0; i < (int) addonsToggles.size(); i++){
-                ofxToggle toggle = panelOtherAddons.getToggle(addonsToggles[i]);
-                if(toggle){
-                    ofAddon addon;
-                    addon.pathToOF = getOFRelPath(path);
-                    cout << getOFRelPath(path) << " " << path << endl;
-                    addon.fromFS(ofFilePath::join(addonsPath, addonsToggles[i]),target);
-                    project->addAddon(addon);
-
-                }
-            }
-
-            project->save(true);
-        }
-	}
-
-
-    printf("done with project generation \n");
-    setStatus("generated: " + buttons[1].myText + "/" + buttons[0].myText);
-
-    // go through the control panels, do stuff
 }
 
 //--------------------------------------------------------------
 void testApp::keyReleased(int key){
-
-
-
 }
 
 //--------------------------------------------------------------
 void testApp::mouseMoved(int x, int y ){
-
 }
 
 //--------------------------------------------------------------
 void testApp::mouseDragged(int x, int y, int button){
-
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-
+    ofPoint mouse = ofPoint(x, y);
     if (mode == MODE_NORMAL){
-        // check the mouse for press
-        //
+
         for (int i = 0; i < buttons.size(); i++){
-            buttons[i].checkMousePressed(ofPoint(x, y));
+            buttons[i].checkMousePressed(mouse);
         }
         
-        //-------------------------------------
-        // 4 = genearate
-        //-------------------------------------
-        if (generateButton.bMouseOver == true){
-            generateProject();
-        }
-
         //-------------------------------------
         // 0 = sketch name
         //-------------------------------------
         if (buttons[0].bMouseOver == true){
-            string text = ofSystemTextBoxDialog("choose sketch name", buttons[0].myText);
+            string text = ofSystemTextBoxDialog("choose sketch name", buttons[0].text);
             fixStringCharacters(text);
             setStatus("sketch name set to: " + text);
             buttons[0].setText(text);
@@ -541,7 +608,6 @@ void testApp::mousePressed(int x, int y, int button){
             if (!dir.exists()){
                 dir.create();
             }
-
           	
         #ifdef TARGET_WIN32
                     ofFileDialogResult res = ofSystemLoadDialog("please select sketch folder", true, windowsFromUnixPath(dir.path()));
@@ -557,16 +623,11 @@ void testApp::mousePressed(int x, int y, int button){
                 
                 setStatus("path set to: " + result);
             }
-
-
         }
-
 
         //-------------------------------------
         // 2 = platform  (disabled)
         //-------------------------------------
-
-
         if (buttons[2].bMouseOver == true){
             // platform is diabled for now
              mode = 2;
@@ -575,41 +636,65 @@ void testApp::mousePressed(int x, int y, int button){
         //-------------------------------------
         // 3 = addon
         //-------------------------------------
-
         if (buttons[3].bMouseOver == true){
             mode = MODE_ADDON;
-
+        }
+        
+        //-------------------------------------
+        // 4 = genearate
+        //-------------------------------------
+        if (generateButton.bMouseOver == true){
+            generateProject();
         }
     }
 
-    //-------------------------------------
-    // handle addon mode
-    //-------------------------------------
-
     if (mode == MODE_ADDON ){
-
+        
+        coreAddonsList.checkMousePressed(mouse);
+        if(bHaveNonCoreAddons)
+            otherAddonsList.checkMousePressed(mouse);
+        
         //-------------------------------------
         // if we hit he back button, collect the addons for display
         //-------------------------------------
 
         if (addonButton.bMouseOver){
+//            string addons = "";
+//            for (int i = 0; i < panelCoreAddons.getNumControls(); i++){
+//                if (*((ofxToggle *)panelCoreAddons.getControl(i))){
+//                   if (addons.length() > 0) addons+=", ";
+//                    addons += ((ofxToggle *)panelCoreAddons.getControl(i))->getName();
+//
+//                }
+//
+//            }
+//            
+//            for (int i = 0; i < panelOtherAddons.getNumControls(); i++){
+//                if (*((ofxToggle *)panelOtherAddons.getControl(i))){
+//                    if (addons.length() > 0) addons+=", ";
+//                    addons += ((ofxToggle *)panelOtherAddons.getControl(i))->getName();
+//
+//                }
+//
+//            }
             string addons = "";
-            for (int i = 0; i < panelCoreAddons.getNumControls(); i++){
-                if (*((ofxToggle *)panelCoreAddons.getControl(i))){
-                   if (addons.length() > 0) addons+=", ";
-                    addons += ((ofxToggle *)panelCoreAddons.getControl(i))->getName();
-
-                }
-
+            
+            vector<string> sAddons = coreAddonsList.getSelected();
+            for(int i = 0; i < sAddons.size(); i++){
+                if (addons.length() > 0)
+                    addons += ", ";
+                
+                addons += sAddons[i];
             }
-            for (int i = 0; i < panelOtherAddons.getNumControls(); i++){
-                if (*((ofxToggle *)panelOtherAddons.getControl(i))){
-                    if (addons.length() > 0) addons+=", ";
-                    addons += ((ofxToggle *)panelOtherAddons.getControl(i))->getName();
-
-                }
-
+            
+            sAddons = otherAddonsList.getSelected();
+            for(int i = 0; i < sAddons.size(); i++){
+                if (addons.length() > 0)
+                    addons += ", ";
+                
+                addons += sAddons[i];
             }
+            
             buttons[3].setText(addons);
 
             setStatus("addons set to: " + addons);
@@ -631,14 +716,11 @@ void testApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void testApp::windowResized(int w, int h){
-    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - generateButton.rect.width + 10 ,
-                                     ofGetHeight() - generateButton.rect.height - 40);// 535);
+    generateButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - generateButton.width + 10, ofGetHeight() - generateButton.height - 40);// 535);
     generateButton.calculateRect();
     
-    addonButton.topLeftAnchor.set(ofGetWidth() - buttons[0].rect.x - addonButton.rect.width + 10 ,
-                                  ofGetHeight() - addonButton.rect.height - 40);// 535);
+    addonButton.topLeftAnchor.set(ofGetWidth() - buttons[0].x - addonButton.width + 10, ofGetHeight() - addonButton.height - 40);// 535);
     addonButton.calculateRect();
-    
 }
 
 //--------------------------------------------------------------
@@ -652,79 +734,10 @@ void testApp::dragEvent(ofDragInfo dragInfo){
         for (int i = 0; i < dragInfo.files.size(); i++){
             cout << dragInfo.files[i] << endl;
     } else if (dragInfo.files.size() == 1) {
-        ofDirectory pathFolder;
-        pathFolder.open(dragInfo.files[0]);
         
-        // 1.If is a directory
-        //
-        if (!pathFolder.isDirectory())
-            return;
-        
-        //  2. and have a:
-        //          - src/main.cpp
-        //          - src/testApp.h
-        //          - src/testApp.cpp
-        ofFile test;
-        bool    isMainCpp = test.open(dragInfo.files[0]+"/src/main.cpp");
-        bool    isTestAppH = test.open(dragInfo.files[0]+"/src/testApp.h");
-        bool    isTestAppCpp = test.open(dragInfo.files[0]+"/src/testApp.cpp");
-        if ( !(isMainCpp && isTestAppH && isTestAppCpp) )
-            return;
-        
-        loadProject(dragInfo.files[0]);
-    }
-}
-
-void testApp::loadProject(string _path){
-    //  Extract Name and Path
-    //
-    string tmpName = "";
-    string tmpPath = "";
-    int i;
-    for (i = _path.size()-1 ; _path[i] != '/'; i--){
-        tmpName.insert(tmpName.begin(), _path[i]);
-    }
-    buttons[0].setText(tmpName);
-    for (i-- ; _path[i] >= 0; i--){
-        tmpPath.insert(tmpPath.begin(), _path[i]);
-    }
-    buttons[1].setText(tmpPath);
-    
-    setStatus("Project " + tmpName + " loaded ");
-    
-    //  Have addons.make??
-    //
-    ofFile test;
-    bool    isAddons = test.open(_path+"/addons.make");
-    if ( !isAddons )
-        return;
-    
-    //  Add addons
-    //
-    ifstream	fs( (_path+"/addons.make").c_str());
-    int counter = 0;
-    string line;
-    string addonsAdded = "";
-    while(!(fs >> line).fail()){
-        
-        if ( isAddonCore(line) ){
-            ofxToggle *toogle = (ofxToggle*)panelCoreAddons.getControl(line);
-            if (toogle != NULL)
-                *toogle = true;
-        } else {
-            ofxToggle *toogle = (ofxToggle*)panelOtherAddons.getControl(line);
-            if (toogle != NULL)
-                *toogle = true;
+        string open = dragInfo.files[0];
+        if (isProjectFolder(open)){
+            loadProject(open);
         }
-        
-        if (counter > 0)
-            addonsAdded +=", ";
-        addonsAdded += line;
-        counter++;
     }
-    fs.seekg(0,ios::beg);
-    fs.clear();
-    fs.close();
-    
-    buttons[3].setText(addonsAdded);
 }
